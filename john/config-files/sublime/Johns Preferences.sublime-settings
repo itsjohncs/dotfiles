@@ -1,8 +1,10 @@
 {
+	"color_scheme": "Packages/Color Scheme - Default/Solarized (Light).tmTheme",
+	"ensure_newline_at_eof_on_save": true,
 	"font_size": 15,
-    "ensure_newline_at_eof_on_save": true,
 	"rulers":
 	[
 		80
-	]
+	],
+	"trim_trailing_white_space_on_save": true
 }

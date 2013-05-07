@@ -15,4 +15,12 @@
 	{ "keys": ["alt+'"], "command": "move_to", "args": {"to": "eol", "extend": false} },
 	{ "keys": ["shift+alt+;"], "command": "move_to", "args": {"to": "bol", "extend": true} },
 	{ "keys": ["shift+alt+'"], "command": "move_to", "args": {"to": "eol", "extend": true} },
+
+	{ "keys": ["ctrl+alt+k"], "command": "scroll_lines", "args": {"amount": 1.0 } },
+	{ "keys": ["ctrl+alt+j"], "command": "scroll_lines", "args": {"amount": -1.0 } },
+
+	{ "keys": ["alt+x"], "command": "close" },
+
+	{ "keys": ["ctrl+shift+alt+k"], "command": "swap_line_up" },
+	{ "keys": ["ctrl+shift+alt+j"], "command": "swap_line_down" },
 ]

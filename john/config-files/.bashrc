@@ -1,0 +1,13 @@
+alias d="cd"
+alias s="ls"
+
+alias gs="git status"
+alias gd="git diff"
+alias gdc="git diff --cached"
+alias gc="git checkout"
+alias gb="git branch"
+alias gm="git commit"
+alias ga="git add"
+alias gal="git add -u"
+alias gl="git log"
+alias gcp="git cherry-pick"

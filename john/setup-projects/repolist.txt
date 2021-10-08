@@ -1,7 +1,0 @@
-galah-group/galah
-galah-group/galah-sheep-simulator
-galah-group/galah-apiclient
-galah-group/galah-interact-python
-galah-group/galah-aux
-brownhead/120B-prepatory-scripts
-brownhead/flair-flairy

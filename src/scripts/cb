@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if [[ $# -ne 0 ]]; then
+    echo "$0"
+    echo
+    echo "Places contents of stdin into clipboard after trimming leading"
+    echo "and trailing whitespace. Use pbcopy for non-trimming version."
+    exit 1
+fi
+
+set -eo pipefail
+python -c 'import sys;sys.stdout.write(sys.stdin.read().strip())' | pbcopy

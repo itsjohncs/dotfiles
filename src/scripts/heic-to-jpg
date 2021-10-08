@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+if [[ $# -eq 0 || ( $# == 1 && ( $1 == -h || $1 == --help ) ) ]]; then
+    echo "$0 FILE [FILE...]"
+    echo
+    echo "Converts given .heic files to .jpg files."
+    exit 1
+fi
+
+for i in "$@"; do
+    if [[ $i =~ ^.+\.heic$ ]]; then
+        sips -s format jpeg "$i" --out "${i%.heic}.jpg"
+    else
+        echo "$i doesn't end with '.heic'. Ignoring."
+    fi
+done

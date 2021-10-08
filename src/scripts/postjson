@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+if [[ $# -lt 2 ]]; then
+    echo "$0 URL DATA"
+    echo
+    echo "Sends POST request to URL with given JSON data."
+    exit 1
+fi
+
+set -x
+curl \
+    --header "Content-Type: application/json" \
+    --data "$2" \
+    "$1" \
+    "${@:3}"

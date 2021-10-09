@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+if [[ $# -ne 0 ]]; then
+    echo "$0"
+    echo
+    echo "Returns a random port number between 1024 and 65536."
+    exit 1
+fi
+
+python3 -c "import random; print(random.randint(1024, 65536))"
+

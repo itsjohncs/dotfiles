@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
+set -e
 
 if [[ $# -ne 0 ]]; then
     echo "$0"
@@ -10,9 +10,11 @@ if [[ $# -ne 0 ]]; then
     exit 1
 fi
 
-FILE="$( ( git ls-files -m; git ls-files -o ) | head -n 1 | tr -d '\n' )"
+SCRIPT_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P )"
+
+FILE="$( ( git ls-files -m && git ls-files --exclude-standard -o ) | head -n 1 )"
 if [[ -n $FILE ]]; then
-    pbcopy <<< "$FILE"
+    "$SCRIPT_DIR/cb" <<< "$FILE"
     echo "Copied \"$FILE\""
 else
     echo "No such file."

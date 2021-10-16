@@ -1,18 +1,22 @@
 #!/usr/bin/env bash
 
-set -e
+set -eo pipefail
 
-if [[ $# -ne 0 ]]; then
-    echo "$0"
+if [[ $# -gt 1 || ${1-0} -lt 0 ]]; then
+    echo "$0" [SKIP_N=0]
     echo
-    echo "Copy name of first modified file in git repo, or first untracked"
-    echo "file if no such file exists."
+    echo "Looks at the list of files displayed by git-status and"
+    echo "after skipping the first SKIP_N entires, will copy the top"
+    echo "file to your clipboard."
     exit 1
 fi
 
 SCRIPT_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P )"
 
-FILE="$( ( git ls-files -m && git ls-files --exclude-standard -o ) | head -n 1 )"
+FILE="$(
+    ( git ls-files -m && git ls-files --exclude-standard -o ) |
+    tail -n +$(( ${1-0} + 1 )) |
+    head -n 1 )"
 if [[ -n $FILE ]]; then
     "$SCRIPT_DIR/cb" <<< "$FILE"
     echo "Copied \"$FILE\""

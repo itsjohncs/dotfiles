@@ -16,3 +16,7 @@ shopt -s cmdhist
 # Update the history file after each command. This'll ensure that when we start
 # a new shell we have everything.
 PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+
+# If we didn't change this, opening up a single bash session without loading
+# this file would risk blowing away all our history.
+HISTFILE="$HOME/.my_bash_history"

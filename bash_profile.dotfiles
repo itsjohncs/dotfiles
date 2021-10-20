@@ -7,6 +7,11 @@ for i in "$SCRIPT_DIR"/src/bash_profile.d/*; do
     source "$i"
 done
 
+for i in "$SCRIPT_DIR"/src/scripts/completions/*; do
+    # shellcheck source=/dev/null
+    source "$i"
+done
+
 # Entry point for installed https://github.com/scop/bash-completion
 if [[ -r ${JCS_BASH_COMPLETION_ENTRY_POINT-} ]]; then
     # shellcheck source=/dev/null

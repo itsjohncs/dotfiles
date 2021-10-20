@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [[ $# -ne 0 ]]; then
+    echo "$0"
+    echo
+    echo "Uploads stdin to termbin.com and copies URL to clipboard."
+    exit 1
+fi
+
+URL="$(nc termbin.com 9999 | tr -d "\0")"
+cb <<< "$URL"
+echo "$URL (copied to clipboard)"
+
+PRETTY_URL="$(
+    sed "s/\/termbin.com/\/l.termbin.com/g" <<< "$URL")"
+echo "Highlighted version at $PRETTY_URL"

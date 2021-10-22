@@ -7,7 +7,7 @@ for i in "$SCRIPT_DIR"/src/bash_profile.d/*; do
     source "$i"
 done
 
-for i in "$SCRIPT_DIR"/src/scripts/completions/*; do
+for i in "$SCRIPT_DIR"/src/completions/*; do
     # shellcheck source=/dev/null
     source "$i"
 done

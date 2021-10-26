@@ -12,6 +12,17 @@ function p {
         exit 1
     fi
 
-    subl "$PROJECT_DIR"
+    SUBLIME_WORKSPACE="$(
+        find "$PROJECT_DIR" \
+            -maxdepth 1 \
+            -name "*.sublime-workspace" \
+            -print -quit
+    )"
+    if [[ -f "$SUBLIME_WORKSPACE" ]]; then
+        subl "$SUBLIME_WORKSPACE"
+    else
+        subl "$PROJECT_DIR"
+    fi
+
     cd "$PROJECT_DIR" || return $?
 }

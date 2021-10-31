@@ -11,7 +11,7 @@ function bash_shebang_present {
 export -f bash_shebang_present
 
 find "$ROOT_DIR" \
-    -name ".?*" -prune -o \
+    \( -name ".?*" -o -path "./src/complete-alias" \) -prune -o \
     \( -name "*.sh" -o \
        -name "bash_profile.dotfiles" -o \
        -type f -a -exec bash -c 'bash_shebang_present "$0"' {} \; \) \

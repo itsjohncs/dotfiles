@@ -26,3 +26,8 @@ function p {
 
     cd "$PROJECT_DIR" || return $?
 }
+
+function pd {
+    # shellcheck disable=SC2164
+    cd "$HOME/personal/$1"
+}

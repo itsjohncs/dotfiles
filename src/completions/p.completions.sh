@@ -8,3 +8,4 @@ function _p_completions {
 }
 
 complete -F _p_completions p
+complete -F _p_completions pd

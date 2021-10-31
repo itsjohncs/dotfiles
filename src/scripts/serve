@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -ue
+
+function contains {
+    for i in "${@:2}"; do
+        if [[ $i == "$1" ]]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+if contains --port "$@"; then
+    set -x
+    npx http-server "$@"
+else
+    set -x
+    npx http-server --port 2282 "$@"
+fi

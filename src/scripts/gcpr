@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+set -eu
+
+if [[ $# -eq 0 || $# -gt 2 ]]; then
+    echo "$0 PR_NUMBER [remote]"
+    echo
+    echo "Checks out GitHub PR #\$PR_NUMBER from the given remote. The new"
+    echo "branch will be named pr-\$PR_NUMBER."
+    echo
+    echo "If remote is unspecified, it will default to upstream, and then"
+    echo "origin if there's no upstream remote."
+    exit 1
+fi
+
+function remote_exists {
+    git remote get-url "$1" > /dev/null 2>&1
+}
+
+REMOTE="${2-}"
+if [[ -z $REMOTE ]]; then
+    if remote_exists upstream; then
+        REMOTE="upstream"
+    elif remote_exists origin; then
+        REMOTE="origin"
+    else
+        echo "No suitable remote found (are you in a git repo?)"
+    fi
+fi
+
+set -x
+git fetch "$REMOTE" "pull/$1/head"
+git branch "pr-$1" FETCH_HEAD
+git checkout "pr-$1"

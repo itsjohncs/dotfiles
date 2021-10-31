@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## Convert heic files to jpg files.
+
 if [[ $# -eq 0 || ( $# == 1 && ( $1 == -h || $1 == --help ) ) ]]; then
     echo "$0 FILE [FILE...]"
     echo

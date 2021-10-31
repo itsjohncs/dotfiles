@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## Checkout PR from GitHub.
+
 set -eu
 
 if [[ $# -eq 0 || $# -gt 2 ]]; then

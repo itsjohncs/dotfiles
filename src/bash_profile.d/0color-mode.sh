@@ -1,3 +1,4 @@
+## update_dark_light_mode: Changes terminal color profile.
 # shellcheck disable=SC2120
 function update_dark_light_mode {
     local MODE

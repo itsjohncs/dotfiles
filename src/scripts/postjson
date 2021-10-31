@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## Sends POST request to URL with given JSON data.
+
 if [[ $# -lt 2 ]]; then
     echo "$0 URL DATA"
     echo

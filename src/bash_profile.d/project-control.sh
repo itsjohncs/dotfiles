@@ -1,3 +1,4 @@
+## p: Opens dev environment for project.
 function p {
     if [[ $# -ne 1 ]]; then
         echo "$0 PROJECT"
@@ -27,6 +28,7 @@ function p {
     cd "$PROJECT_DIR" || return $?
 }
 
+## pd: Changes directory to project.
 function pd {
     # shellcheck disable=SC2164
     cd "$HOME/personal/$1"

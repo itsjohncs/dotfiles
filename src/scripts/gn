@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## Copy particular file from output of git-status to clipboard.
+
 set -eo pipefail
 
 if [[ $# -gt 1 || ${1-0} -lt 0 ]]; then

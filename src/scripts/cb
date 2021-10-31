@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## Trim starting and ending whitespace then copy stdin into clipboard.
+
 if [[ $# -ne 0 ]]; then
     echo "$0"
     echo

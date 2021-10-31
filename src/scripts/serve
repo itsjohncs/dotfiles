@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## Serve current directory over HTTP.
+
 set -ue
 
 function contains {

@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+
+## Print help text for my shortcuts and scripts.
+
+import collections
+import itertools
+import os
+import re
+import sys
+
+Entry = collections.namedtuple("Entry", ["command", "description"])
+
+ENTRY_RE = re.compile(r"^## (?:([a-zA-Z0-9_-]+): )?(.*)$")
+
+def parse_entries(path):
+    basename = os.path.basename(path)
+    with open(path, encoding="utf8") as f:
+        for line in f:
+            line = line.strip()
+            match = ENTRY_RE.match(line)
+            if match:
+                command, description = match.groups()
+                yield Entry(command or basename, description)
+
+IGNORE = {"complete-alias"}
+
+def list_files():
+    parent_dir = os.path.join(os.path.dirname(__file__), "..")
+    for root, dirs, files in os.walk(parent_dir):
+        dirs[:] = [i for i in dirs if i not in IGNORE]
+        for name in files:
+            if name not in IGNORE:
+                yield os.path.join(root, name)
+
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        print(f"USAGE: {sys.argv[0]}")
+        print()
+        print("Print short summary information for each script and shortcut")
+        print("added by dotfiles.")
+        sys.exit(1)
+
+    entries = sorted(itertools.chain.from_iterable(
+        parse_entries(path) for path in list_files()))
+
+    longest_command = max(len(i.command) for i in entries)
+    for entry in entries:
+        if os.isatty(1):
+            print("\x1b[1;34m{}\x1b[0m {}".format(
+                entry.command.rjust(longest_command),
+                entry.description))
+        else:
+            print("{}: {}".format(*entry))

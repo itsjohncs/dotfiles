@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## Uploads stdin to termbin.com and copies URL to clipboard.
+
 set -e
 
 if [[ $# -ne 0 ]]; then

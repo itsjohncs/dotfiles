@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
+## Print random port number.
+
 if [[ $# -ne 0 ]]; then
     echo "$0"
     echo
-    echo "Returns a random port number between 1024 and 65536."
+    echo "Prints a random port number between 1024 and 65536."
     exit 1
 fi
 

@@ -8,19 +8,22 @@ import os
 import re
 import sys
 
-Entry = collections.namedtuple("Entry", ["command", "description"])
+Entry = collections.namedtuple("Entry", ["command", "description", "is_alias"])
 
 ENTRY_RE = re.compile(r"^## (?:([a-zA-Z0-9_-]+): )?(.*)$")
+ALIAS_RE = re.compile(r"^alias ([a-zA-Z0-9_-]+)=\"(.+)\"$")
 
 def parse_entries(path):
     basename = os.path.basename(path)
     with open(path, encoding="utf8") as f:
         for line in f:
             line = line.strip()
-            match = ENTRY_RE.match(line)
-            if match:
+
+            if match := ENTRY_RE.match(line):
                 command, description = match.groups()
-                yield Entry(command or basename, description)
+                yield Entry(command or basename, description, False)
+            elif match := ALIAS_RE.match(line):
+                yield Entry(*match.groups(), True)
 
 IGNORE = {"complete-alias"}
 
@@ -32,7 +35,13 @@ def list_files():
             if name not in IGNORE:
                 yield os.path.join(root, name)
 
-if __name__ == "__main__":
+def style_command(text):
+    return f"\x1b[34m{text}\x1b[0m"
+
+def style_alias(text):
+    return f"\x1b[33m{text}\x1b[0m"
+
+def main():
     if len(sys.argv) > 1:
         print(f"USAGE: {sys.argv[0]}")
         print()
@@ -43,11 +52,21 @@ if __name__ == "__main__":
     entries = sorted(itertools.chain.from_iterable(
         parse_entries(path) for path in list_files()))
 
-    longest_command = max(len(i.command) for i in entries)
-    for entry in entries:
+    longest_name = max(len(entry.command) for entry in entries)
+    for command, description, is_alias in entries:
         if os.isatty(1):
-            print("\x1b[1;34m{}\x1b[0m {}".format(
-                entry.command.rjust(longest_command),
-                entry.description))
+            formatted_description = description
+            if is_alias:
+                formatted_description = style_alias(formatted_description)
+
+            print("{} {}".format(
+                style_command(command.rjust(longest_name)),
+                formatted_description))
         else:
-            print("{}: {}".format(*entry))
+            print("{}: {}{}".format(
+                command,
+                "ALIASES " if is_alias else "",
+                description))
+
+if __name__ == "__main__":
+    main()

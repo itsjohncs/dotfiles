@@ -18,6 +18,7 @@ SCRIPT_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P )"
 CURRENT_DIR="$PWD"
 FILE="$(git status --porcelain |
     sed -n "/^.[^ ]/ p" | # Skip staged changes
+    sed -E "s/^RM .+ -> (.+)$/M  \1/" | # Treat renames same as modifications
     cut -c 4- |
     tail -n +$(( ${1-0} + 1 )) |
     head -n 1 |

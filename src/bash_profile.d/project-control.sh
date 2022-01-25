@@ -19,10 +19,16 @@ function p {
             -name "*.sublime-workspace" \
             -print -quit
     )"
-    if [[ -f "$SUBLIME_WORKSPACE" ]]; then
+    if [[ -f $SUBLIME_WORKSPACE ]]; then
         subl "$SUBLIME_WORKSPACE"
     else
         subl "$PROJECT_DIR"
+    fi
+
+    SETUP_SCRIPT="$PROJECT_DIR/.dotfiles-setup.sh"
+    if [[ -f $SETUP_SCRIPT ]]; then
+        # shellcheck source=/dev/null
+        source "$SETUP_SCRIPT"
     fi
 
     cd "$PROJECT_DIR" || return $?
@@ -30,6 +36,13 @@ function p {
 
 ## pd: Changes directory to project.
 function pd {
-    # shellcheck disable=SC2164
-    cd "$HOME/personal/$1"
+    PROJECT_DIR="$HOME/personal/$1"
+
+    cd "$PROJECT_DIR" || return 1
+
+    SETUP_SCRIPT="$PROJECT_DIR/.dotfiles-setup.sh"
+    if [[ -f $SETUP_SCRIPT ]]; then
+        # shellcheck source=/dev/null
+        source "$SETUP_SCRIPT"
+    fi
 }

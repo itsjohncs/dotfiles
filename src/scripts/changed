@@ -15,12 +15,11 @@ CURRENT_DIR="$PWD"
 
 mapfile -d "" -t FILES < <(
     git status --porcelain |
-        sed -n "/^.[^ ]/ p" | # Skip staged changes
         sed -E "s/^RM .+ -> (.+)$/M  \1/" | # Treat renames same as modifications
         cut -c 4- |
         (
             cd "$(git rev-parse --show-toplevel)"
-            gxargs --delimiter="\n" realpath -z --relative-to "$CURRENT_DIR"
+            gxargs -r --delimiter="\n" realpath -z --relative-to "$CURRENT_DIR"
         )
 )
 

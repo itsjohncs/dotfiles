@@ -3,6 +3,7 @@ alias s="ls"
 
 alias ga="git add"
 alias gc="git checkout"
+alias gb="git branch"
 alias gd="git diff"
 alias gdc="git diff --cached"
 alias gg="git grep --untracked --line-number"

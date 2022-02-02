@@ -1,4 +1,3 @@
-alias d="cd"
 alias s="ls"
 
 alias ga="git add"

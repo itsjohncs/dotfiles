@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 
-## Copy names of all changed files in a git repo.
+## Copy or print names of all changed files in a git repo.
 
 set -eo pipefail
 
-if [[ $# -gt 1 || ${1-0} -lt 0 ]]; then
+if [[ $# -gt 1 || ! ${1-} =~ ^(-p|-c)?$ ]]; then
     echo "$0"
     echo
-    echo "Copy names of all changed files in a git repo."
+    echo "Copy names of all changed files in a git repo. Names"
+    echo "with spaces will be quoted."
+    echo
+    echo "If stdout is not a terminal, the changed files will be"
+    echo "printed instead with null characters delimiting them."
+    echo
+    echo "Use -p to force printing or -c to force copying."
     exit 1
 fi
 
@@ -23,5 +29,9 @@ mapfile -d "" -t FILES < <(
         )
 )
 
-printf "%q " "${FILES[@]}" | cb
-echo "Copied ${#FILES[@]} file names."
+if [[ ${1-} = -c || ( ${1-} != -p && -t 1 ) ]]; then
+    printf "%q " "${FILES[@]}" | cb
+    echo "Copied ${#FILES[@]} file names."
+else
+    printf "%s\0" "${FILES[@]}"
+fi

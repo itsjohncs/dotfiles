@@ -10,8 +10,9 @@ if [[ $# -eq 0 || ( $# == 1 && ( $1 == -h || $1 == --help ) ) ]]; then
 fi
 
 for i in "$@"; do
-    if [[ $i =~ ^.+\.heic$ ]]; then
-        sips -s format jpeg "$i" --out "${i%.heic}.jpg"
+    if grep -E --quiet -i '^.+\.heic$' <<< "$i"; then
+        # shellcheck disable=SC2001
+        sips -s format jpeg "$i" --out "$(sed 's/.heic$/.jpg/i' <<< "$i")"
     else
         echo "$i doesn't end with '.heic'. Ignoring."
     fi

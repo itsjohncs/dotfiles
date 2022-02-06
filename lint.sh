@@ -27,3 +27,10 @@ find "$ROOT_DIR" \
         -c 'shebang_present "#!/usr/bin/env python3" "$0"' {} \; \
     -print0 \
     | xargs -0t pylint --disable=C0103,C0114,C0116
+
+find "$ROOT_DIR" \
+    \( -name ".?*" -o -path "./src/complete-alias" \) -prune -o \
+    -type f -a -exec bash \
+        -c 'shebang_present "#!/usr/bin/env node" "$0"' {} \; \
+    -print0 \
+    | xargs -0t npx eslint

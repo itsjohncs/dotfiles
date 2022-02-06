@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+
+//## A simple way to construct JSON.
+
+for(const [k, v] of Object.entries(process.env)) {
+    if (!Object.prototype.hasOwnProperty.call(global, k)) {
+        global[k] = v;
+    }
+}
+
+if (process.argv[2]) {
+    console.log(JSON.stringify(eval('(' + process.argv[2] + ')')));
+}

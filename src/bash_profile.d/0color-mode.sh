@@ -8,9 +8,11 @@ function color_mode {
     fi
 
     if [[ $MODE == Light || $MODE == Dark ]]; then
-        osascript -e "tell application \"Terminal\"
-          set current settings of tabs of windows to settings set \"Solarized $MODE\"
-        end tell" &
+        (
+            osascript -e "tell application \"Terminal\"
+              set current settings of tabs of windows to settings set \"Solarized $MODE\"
+            end tell" &
+        )
     else
         echo "USAGE: color_mode [MODE]"
         echo

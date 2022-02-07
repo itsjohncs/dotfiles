@@ -1,3 +1,6 @@
 [submodule "src/complete-alias"]
 	path = src/complete-alias
 	url = git@github.com:cykerway/complete-alias.git
+[submodule "src/dark-mode-notify"]
+	path = src/dark-mode-notify
+	url = git@github.com:bouk/dark-mode-notify.git

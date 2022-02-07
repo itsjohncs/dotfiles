@@ -1,10 +1,27 @@
+#!/usr/bin/env bash
+
+# This can be run as a script as well
+
 ## color_mode: Changes terminal color profile.
 # shellcheck disable=SC2120
 function color_mode {
     local MODE
-    MODE="${1-"$(defaults read -g AppleInterfaceStyle 2>/dev/null)"}"
-    if [[ -z $MODE ]]; then
-        MODE=Light
+    if [[ -n ${1-} ]]; then
+        MODE="$1"
+    elif [[ -n ${DARKMODE-} ]]; then
+        if [[ $DARKMODE -eq 0 ]]; then
+            MODE=Light
+        else
+            MODE=Dark
+        fi
+    else
+        local DEFAULT_MODE
+        DEFAULT_MODE="$(defaults read -g AppleInterfaceStyle 2>/dev/null)"
+        if [[ -n $DEFAULT_MODE ]]; then
+            MODE="$DEFAULT_MODE"
+        else
+            MODE=Light
+        fi
     fi
 
     if [[ $MODE == Light || $MODE == Dark ]]; then
@@ -23,4 +40,10 @@ function color_mode {
     fi
 }
 
-color_mode
+# If this file has been sourced (ie: not run as a script) the command line
+# arguments weren't meant for us.
+if (return 0 2>/dev/null); then
+    color_mode
+else
+    color_mode "$@"
+fi

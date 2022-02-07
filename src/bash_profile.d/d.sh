@@ -1,3 +1,5 @@
+# shellcheck disable=SC2164
+
 ## d: Alias for cd (with a little extra functionality)
 function d {
     if [[ $# -eq 1 && -f $1 && ! -d $1 ]]; then
@@ -5,9 +7,10 @@ function d {
         DIRNAME="$(dirname "$1")"
         if [[ ! $PWD -ef $DIRNAME ]]; then
             echo "correcting: $1 -> $DIRNAME"
-            cd "$DIRNAME" || return $?
+            cd "$DIRNAME"
+            return $?
         fi
     fi
 
-    cd "$@" || return $?
+    cd "$@"
 }

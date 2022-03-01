@@ -25,7 +25,7 @@ def parse_entries(path):
             elif match := ALIAS_RE.match(line):
                 yield Entry(*match.groups(), True)
 
-IGNORE = {"complete-alias"}
+IGNORE = {"complete-alias", "dark-mode-notify"}
 
 def list_files():
     parent_dir = os.path.join(os.path.dirname(__file__), "..")

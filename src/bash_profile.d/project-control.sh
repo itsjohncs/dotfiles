@@ -1,6 +1,9 @@
 ## p: Opens dev environment for project.
 function p {
-    if [[ $# -ne 1 ]]; then
+    if [[ $# -eq 0 ]]; then
+        pi
+        return $?
+    elif [[ $# -ne 1 ]]; then
         echo "$0 PROJECT"
         echo
         echo "Opens and prepares dev environment for PROJECT."
@@ -13,21 +16,6 @@ function p {
     if ! pi 2> /dev/null; then
         echo "WARNING: Unexpected error while initializing project" >&2
     fi
-
-    local SUBLIME_WORKSPACE
-    SUBLIME_WORKSPACE="$(
-        find "$PROJECT_DIR" \
-            -maxdepth 1 \
-            -name "*.sublime-workspace" \
-            -print -quit
-    )"
-    if [[ -f $SUBLIME_WORKSPACE ]]; then
-        subl "$SUBLIME_WORKSPACE"
-    else
-        subl "$PROJECT_DIR"
-    fi
-
-    cd "$PROJECT_DIR" || return $?
 }
 
 ## pd: Changes directory to project.
@@ -64,6 +52,17 @@ function pi {
             echo "FATAL: Current directory is not within a project" >&2
         fi
         return 1
+    fi
+
+    local SUBLIME_PROJECT
+    SUBLIME_PROJECT="$(
+        find "$PROJECT_DIR" \
+            -maxdepth 1 \
+            -name "*.sublime-project" \
+            -print -quit
+    )"
+    if [[ -f $SUBLIME_PROJECT ]]; then
+        subl --background --project "$SUBLIME_PROJECT"
     fi
 
     SETUP_SCRIPT="$PROJECT_DIR/.dotfiles-setup.sh"

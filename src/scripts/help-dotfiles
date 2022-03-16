@@ -11,7 +11,7 @@ import sys
 Entry = collections.namedtuple("Entry", ["command", "description", "is_alias"])
 
 ENTRY_RE = re.compile(r"^(?://)?## (?:([a-zA-Z0-9_-]+): )?(.*)$")
-ALIAS_RE = re.compile(r"^alias ([a-zA-Z0-9_-]+)=\"(.+)\"$")
+ALIAS_RE = re.compile(r"^alias ([a-zA-Z0-9_-]+)=[\"'](.+)[\"']$")
 
 def parse_entries(path):
     basename = os.path.basename(path)

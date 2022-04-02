@@ -4,7 +4,10 @@
 
 set -e
 
-if [[ $# -eq 1 && $1 = unstaged ]]; then
+if [[ $# -eq 1 && $1 = all ]]; then
+    git add --all
+    git stash push
+elif [[ $# -eq 1 && $1 = unstaged ]]; then
     SHORT_HEAD="$(git rev-parse --short HEAD)"
     git commit --no-verify --quiet --message "nopush: temporary commit"
     git add --all

@@ -30,7 +30,7 @@ def parse_args(args):
         "ranges",
         metavar="INDEX_OR_RANGE",
         type=index_or_range,
-        default=[(0, 0)],
+        default=[Range(0, 0)],
         nargs="*",
         help="An index or inclusive range (ex: `1:`, `1:3`).",
     )

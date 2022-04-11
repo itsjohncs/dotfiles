@@ -22,7 +22,7 @@ elif [[ $# -eq 1 && $1 = pop ]]; then
         # nature of the stashed changes.
         TMP_INDEX="$(mktemp -u)"
         cp -f "$(git rev-parse --git-dir)/index" "$TMP_INDEX"
-        GIT_INDEX_FILE="$TMP_INDEX" git stash pop
+        GIT_INDEX_FILE="$TMP_INDEX" git stash pop --quiet
         rm "$TMP_INDEX"
     else
         git stash pop

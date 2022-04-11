@@ -12,8 +12,15 @@ class Range:
     """An inclusive range of indices."""
 
     RANGE_RE = re.compile(
-        r"(?P<index>0|[1-9][0-9]*)|"
-        r"(?P<start>|0|[1-9][0-9]*):(?P<end>|0|[1-9][0-9]*)"
+        r"""
+        ^
+        (?:
+            (?P<index>0|[1-9][0-9]*)|
+            (?P<start>|0|[1-9][0-9]*):(?P<end>|0|[1-9][0-9]*)
+        )
+        $
+        """,
+        re.VERBOSE
     )
 
     def __init__(self, start, end):

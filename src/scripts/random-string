@@ -1,0 +1,41 @@
+#!/usr/bin/env python3
+
+import argparse
+import random
+import string
+import sys
+
+
+def natural_number(value):
+    number = int(value)
+    if number < 1:
+        raise ValueError()
+
+    return number
+
+
+def parse_args(args):
+    parser = argparse.ArgumentParser(
+        description="Generates a random string.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    parser.add_argument(
+        "length",
+        metavar="LENGTH",
+        type=natural_number,
+        default=20,
+        help="Length of generated string.",
+        nargs="?",
+    )
+
+    return parser.parse_args(args)
+
+
+def main(parsed_args):
+    charset = string.digits + string.ascii_letters + string.punctuation + " "
+    print("".join(random.choice(charset) for _ in range(parsed_args.length)))
+
+
+if __name__ == "__main__":
+    main(parse_args(sys.argv[1:]))

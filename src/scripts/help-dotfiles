@@ -3,7 +3,6 @@
 ## Print help text for my shortcuts and scripts.
 
 import collections
-import itertools
 import os
 import re
 import sys
@@ -25,7 +24,7 @@ def parse_entries(path):
             elif match := ALIAS_RE.match(line):
                 yield Entry(*match.groups(), True)
 
-IGNORE = {"complete-alias", "dark-mode-notify"}
+IGNORE = {"complete-alias", "dark-mode-notify", "__pycache__"}
 
 def list_files():
     parent_dir = os.path.join(os.path.dirname(__file__), "..")
@@ -49,8 +48,14 @@ def main():
         print("added by dotfiles.")
         sys.exit(1)
 
-    entries = sorted(itertools.chain.from_iterable(
-        parse_entries(path) for path in list_files()))
+    entries = []
+    for path in list_files():
+        try:
+            entries.extend(parse_entries(path))
+        except Exception as e:
+            raise RuntimeError(f"Failed parsing {path}") from e
+
+    entries.sort()
 
     longest_name = max(len(entry.command) for entry in entries)
     for command, description, is_alias in entries:

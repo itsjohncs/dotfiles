@@ -21,14 +21,18 @@ function p {
 ## pd: Changes directory to project.
 function pd {
     if [[ -z $1 ]]; then
-        echo "$0 PROJECT"
-        echo
-        echo "Changes directory to PROJECT."
-        return 1
-    fi
+        local CURRENT_PROJECT_ROOT
+        CURRENT_PROJECT_ROOT="$(git rev-parse --show-toplevel 2> /dev/null)"
+        if [[ -z $CURRENT_PROJECT_ROOT ]]; then
+            echo "FATAL: You are not in a git repo." >&2
+            return 1
+        fi
 
-    local PROJECT_DIR="$HOME/personal/$1"
-    cd "$HOME/personal/$1" || return 1
+        cd "$CURRENT_PROJECT_ROOT" || return 1
+    else
+        local PROJECT_DIR="$HOME/personal/$1"
+        cd "$HOME/personal/$1" || return 1
+    fi
 }
 
 ## pi: Initializes project.

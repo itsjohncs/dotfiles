@@ -1,9 +1,19 @@
 #!/usr/bin/env python3
 
+## Generate a random string.
+
 import argparse
 import random
 import string
 import sys
+
+
+CHARACTER_CLASSES = {
+    "digits": string.digits,
+    "letters": string.ascii_letters,
+    "punctuation": string.punctuation,
+    "space": " ",
+}
 
 
 def natural_number(value):
@@ -14,10 +24,31 @@ def natural_number(value):
     return number
 
 
+def character_classes(value):
+    result = set()
+    for i in value.split(","):
+        i = i.strip()
+        if i not in CHARACTER_CLASSES:
+            raise ValueError()
+        result.add(i)
+
+    return result
+
+
 def parse_args(args):
     parser = argparse.ArgumentParser(
         description="Generates a random string.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    parser.add_argument(
+        "--exclude",
+        type=character_classes,
+        default=set(),
+        help=(
+            "Comma separated list of character classes to exclude. Must be "
+            f"of {', '.join(CHARACTER_CLASSES.keys())}"
+        ),
     )
 
     parser.add_argument(
@@ -33,7 +64,11 @@ def parse_args(args):
 
 
 def main(parsed_args):
-    charset = string.digits + string.ascii_letters + string.punctuation + " "
+    charset = ""
+    for k, v in CHARACTER_CLASSES.items():
+        if k not in parsed_args.exclude:
+            charset += v
+
     print("".join(random.choice(charset) for _ in range(parsed_args.length)))
 
 

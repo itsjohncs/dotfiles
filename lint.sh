@@ -12,7 +12,7 @@ function shebang_present {
 }
 export -f shebang_present
 
-find -E "$ROOT_DIR" \
+find "$ROOT_DIR" \
     \( -regex ".*/\.[A-Za-z0-9_]+" -o -path "*/src/complete-alias" \) -prune -o \
     \( -name "*.sh" -o \
        -path "*/bash_profile.dotfiles" -o \
@@ -21,14 +21,14 @@ find -E "$ROOT_DIR" \
     -print0 \
     | xargs -0t shellcheck --shell bash
 
-find -E "$ROOT_DIR" \
+find "$ROOT_DIR" \
     \( -regex ".*/\.[A-Za-z0-9_]+" -o -path "*/src/complete-alias" \) -prune -o \
     -type f -a -exec bash \
         -c 'shebang_present "#!/usr/bin/env python3" "$0"' {} \; \
     -print0 \
     | xargs -0t pylint --disable=C0103,C0114,C0116
 
-find -E "$ROOT_DIR" \
+find "$ROOT_DIR" \
     \( -regex ".*/\.[A-Za-z0-9_]+" -o -path "*/src/complete-alias" \) -prune -o \
     -type f -a -exec bash \
         -c 'shebang_present "#!/usr/bin/env node" "$0"' {} \; \

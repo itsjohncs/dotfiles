@@ -64,10 +64,12 @@ def main():
             if is_alias:
                 formatted_description = style_alias(formatted_description)
 
+            # pylint: disable-next=consider-using-f-string
             print("{} {}".format(
                 style_command(command.rjust(longest_name)),
                 formatted_description))
         else:
+            # pylint: disable-next=consider-using-f-string
             print("{}: {}{}".format(
                 command,
                 "ALIASES " if is_alias else "",

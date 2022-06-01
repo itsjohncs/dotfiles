@@ -6,7 +6,7 @@ function d {
         local DIRNAME
         DIRNAME="$(dirname "$1")"
         if [[ ! $PWD -ef $DIRNAME ]]; then
-            echo "correcting: $1 -> $DIRNAME"
+            echo "Navigating to directory containing \"$(basename "$1")\""
             cd "$DIRNAME"
             return $?
         fi

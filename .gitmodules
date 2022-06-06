@@ -4,3 +4,6 @@
 [submodule "src/dark-mode-notify"]
 	path = src/dark-mode-notify
 	url = git@github.com:bouk/dark-mode-notify.git
+[submodule "src/git-select"]
+	path = src/git-select
+	url = git@github.com:itsjohncs/git-select.git

@@ -4,6 +4,7 @@ import sys
 import shlex
 import subprocess
 import argparse
+import os
 
 from lib.ranges import Range
 from lib.status import get_files_from_git_status
@@ -38,12 +39,14 @@ def parse_args(args):
 
 
 def put_clipboard(text):
+    pbcopy = "clip" if os.name == "nt" else "pbcopy"
+
     with subprocess.Popen(
-        ["pbcopy"], stdin=subprocess.PIPE, encoding="utf8"
+        [pbcopy], stdin=subprocess.PIPE, encoding="utf8"
     ) as process:
         process.communicate(text)
         if process.returncode != 0:
-            raise RuntimeError("pbcopy gave non-zero status")
+            raise RuntimeError(f"{pbcopy} gave non-zero status")
 
 
 def main_copy_ranges(ranges):

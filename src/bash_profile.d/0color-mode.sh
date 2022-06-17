@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-# This can be run as a script as well
+# Check if we're on a non-mac system.
+if ! command -v osascript > /dev/null; then
+    return
+fi
+
 
 ## color_mode: Changes terminal color profile.
 # shellcheck disable=SC2120

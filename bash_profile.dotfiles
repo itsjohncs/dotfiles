@@ -1,26 +1,30 @@
-SCRIPT_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P )"
+function __main {
+    local SCRIPT_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P )"
 
-export PATH="$SCRIPT_DIR/src/scripts/:$PATH"
+    export PATH="$SCRIPT_DIR/src/scripts/:$PATH"
 
-for i in "$SCRIPT_DIR"/src/bash_profile.d/*; do
-    # shellcheck source=/dev/null
-    source "$i"
-done
+    for i in "$SCRIPT_DIR"/src/bash_profile.d/*; do
+        # shellcheck source=/dev/null
+        source "$i"
+    done
 
-for i in "$SCRIPT_DIR"/src/completions/*; do
-    # shellcheck source=/dev/null
-    source "$i"
-done
+    for i in "$SCRIPT_DIR"/src/completions/*; do
+        # shellcheck source=/dev/null
+        source "$i"
+    done
 
-# Entry point for installed https://github.com/scop/bash-completion
-if [[ -r ${JCS_BASH_COMPLETION_ENTRY_POINT-} ]]; then
-    # shellcheck source=/dev/null
-    source "$JCS_BASH_COMPLETION_ENTRY_POINT"
+    # Entry point for installed https://github.com/scop/bash-completion
+    if [[ -r ${JCS_BASH_COMPLETION_ENTRY_POINT-} ]]; then
+        # shellcheck source=/dev/null
+        source "$JCS_BASH_COMPLETION_ENTRY_POINT"
 
-    # shellcheck source=/dev/null
-    source "$SCRIPT_DIR/src/complete-alias/complete_alias"
+        # shellcheck source=/dev/null
+        source "$SCRIPT_DIR/src/complete-alias/complete_alias"
 
-    complete -F _complete_alias "${!BASH_ALIASES[@]}"
-else
-    echo "Set \$JCS_BASH_COMPLETION_ENTRY_POINT for completions."
-fi
+        complete -F _complete_alias "${!BASH_ALIASES[@]}"
+    else
+        echo "Set \$JCS_BASH_COMPLETION_ENTRY_POINT for completions."
+    fi
+}
+
+__main

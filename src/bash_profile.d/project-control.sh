@@ -22,7 +22,11 @@ function p {
 function pd {
     if [[ -z $1 ]]; then
         local CURRENT_PROJECT_ROOT
-        CURRENT_PROJECT_ROOT="$(git rev-parse --show-toplevel 2> /dev/null)"
+        CURRENT_PROJECT_ROOT="$(git rev-parse --show-superproject-working-tree 2> /dev/null)"
+        if [[ -z $CURRENT_PROJECT_ROOT ]]; then
+            CURRENT_PROJECT_ROOT="$(git rev-parse --show-toplevel 2> /dev/null)"
+        fi
+
         if [[ -z $CURRENT_PROJECT_ROOT ]]; then
             echo "FATAL: You are not in a git repo." >&2
             return 1

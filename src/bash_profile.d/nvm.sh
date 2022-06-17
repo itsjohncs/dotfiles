@@ -1,11 +1,20 @@
+if [[ ! -d $HOME/.nvm ]]; then
+    echo "WARNING: nvm not installed"
+    return
+fi
+
 export NVM_DIR="$HOME/.nvm"
 
 # Running `nvm use 14.17.6` after sourcing nvm.sh would have the same
 # effect but take an extra second or so to run.
 export PATH="$NVM_DIR/versions/node/v14.17.6/bin:$PATH"
 
-# shellcheck source=/dev/null
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" --no-use
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+    # shellcheck source=/dev/null
+    source "$NVM_DIR/nvm.sh" --no-use
+fi
 
-# shellcheck source=/dev/null
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+if [[ -s "$NVM_DIR/bash_completion" ]]; then
+    # shellcheck source=/dev/null
+    source "$NVM_DIR/bash_completion"
+fi

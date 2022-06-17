@@ -1,2 +1,5 @@
-# Sublime Text (-w waits for file to be closed)
+if [[ -d '/Applications/Sublime Text.app/Contents/SharedSupport/bin' ]]; then
+    export PATH="/Applications/Sublime Text.app/Contents/SharedSupport/bin:$PATH"
+fi
+
 export EDITOR="subl -w"

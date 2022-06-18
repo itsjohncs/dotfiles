@@ -27,6 +27,7 @@ cat > "$HOME/Library/LaunchAgents/ke.bou.dark-mode-notify.plist" << EOM
     <array>
        <string>$HOMEBREW_PREFIX/bin/dark-mode-notify</string>
        <string>$SCRIPT_DIR/src/bash_profile.d/0color-mode.sh</string>
+       <string>--from-env</string>
     </array>
 </dict>
 </plist>

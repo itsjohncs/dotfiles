@@ -10,14 +10,14 @@ fi
 # shellcheck disable=SC2120
 function color_mode {
     local MODE
-    if [[ -n ${1-} ]]; then
-        MODE="$1"
-    elif [[ -n ${DARKMODE-} ]]; then
-        if [[ $DARKMODE -eq 0 ]]; then
+    if [[ ${1-} == --from-env ]]; then
+        if [[ ${DARKMODE-1} -eq 0 ]]; then
             MODE=Light
         else
             MODE=Dark
         fi
+    elif [[ -n ${1-} ]]; then
+        MODE="$1"
     else
         local DEFAULT_MODE
         DEFAULT_MODE="$(defaults read -g AppleInterfaceStyle 2>/dev/null)"

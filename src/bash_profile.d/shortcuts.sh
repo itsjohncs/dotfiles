@@ -18,8 +18,15 @@ function __main {
     local SCRIPT_DIR
     SCRIPT_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P )"
 
-    # shellcheck disable=SC2139 # would warn about SCRIPT_DIR's early expansion
+    # Aliases are used instead of symbolic links because cygwin doesn't support
+    # them. The shellcheck disable directives are because of a warning about
+    # $SCRIPT_DIR's early expansion.
+
+    # shellcheck disable=SC2139
     alias git="$(realpath "$SCRIPT_DIR/../git-select/src/forward.py")"
+
+    # shellcheck disable=SC2139
+    alias gn="$(realpath "$SCRIPT_DIR/../git-select/src/copy.py")"
 }
 
 __main

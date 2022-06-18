@@ -22,7 +22,13 @@ function __main {
         # shellcheck source=/dev/null
         source "$SCRIPT_DIR/src/complete-alias/complete_alias"
 
-        complete -F _complete_alias "${!BASH_ALIASES[@]}"
+        local ALIASES
+        mapfile -t ALIASES < <(
+            printf "%s\n" "${!BASH_ALIASES[@]}" |
+            grep --invert-match "^git$"
+        )
+
+        complete -F _complete_alias "${ALIASES[@]}"
     else
         echo "Set \$JCS_BASH_COMPLETION_ENTRY_POINT for completions."
     fi

@@ -5,6 +5,10 @@ if ! command -v osascript > /dev/null; then
     return
 fi
 
+if ! command -v dark-mode > /dev/null; then
+    echo "WARNING: Could not find dark-mode." >&2
+    return 1
+fi
 
 ## color_mode: Changes terminal color profile.
 # shellcheck disable=SC2120
@@ -19,12 +23,12 @@ function color_mode {
     elif [[ -n ${1-} ]]; then
         MODE="$1"
     else
-        local DEFAULT_MODE
-        DEFAULT_MODE="$(defaults read -g AppleInterfaceStyle 2>/dev/null)"
-        if [[ -n $DEFAULT_MODE ]]; then
-            MODE="$DEFAULT_MODE"
-        else
+        local STATUS
+        STATUS="$(dark-mode status)"
+        if [[ $STATUS == off ]]; then
             MODE=Light
+        else
+            MODE=Dark
         fi
     fi
 

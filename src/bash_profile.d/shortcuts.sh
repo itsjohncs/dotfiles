@@ -14,6 +14,7 @@ function __main {
     alias gsh="git show"
     alias mk="cowsay 'Hi! I love you 💞' && clear"
     alias pre="open -a Preview.app"
+    alias t="TIMCOL_NAME=t timcol"
 
     local SCRIPT_DIR
     SCRIPT_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P )"

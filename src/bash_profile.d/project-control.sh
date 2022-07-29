@@ -43,22 +43,14 @@ function pd {
 # shellcheck disable=SC2120
 function pi {
     local PROJECT_DIR=""
-    if [[ -n $1 ]]; then
-        PROJECT_DIR="$HOME/personal/$1"
-    else
-        local REL
-        REL="$(realpath --relative-to "$HOME/personal" "$PWD")"
-        if [[ $REL =~ ^([^.][^/]+)(/|$) ]]; then
-            PROJECT_DIR="$HOME/personal/${BASH_REMATCH[1]}"
-        fi
+    local REL
+    REL="$(realpath --relative-to "$HOME/personal" "$PWD")"
+    if [[ $REL =~ ^([^.][^/]+)(/|$) ]]; then
+        PROJECT_DIR="$HOME/personal/${BASH_REMATCH[1]}"
     fi
 
     if [[ -z $PROJECT_DIR || ! -d $PROJECT_DIR ]]; then
-        if [[ -n $1 ]]; then
-            echo "FATAL: Unknown project $1" >&2
-        else
-            echo "FATAL: Current directory is not within a project" >&2
-        fi
+        echo "FATAL: Current directory is not within a project" >&2
         return 1
     fi
 
@@ -70,7 +62,11 @@ function pi {
             -print -quit
     )"
     if [[ -f $SUBLIME_PROJECT ]]; then
-        subl --background --project "$SUBLIME_PROJECT"
+        local BACKGROUND_FLAG
+        if [[ ${1:-} != "--foreground" ]]; then
+            BACKGROUND_FLAG=--background
+        fi
+        subl $BACKGROUND_FLAG --project "$SUBLIME_PROJECT"
     fi
 
     SETUP_SCRIPT="$PROJECT_DIR/.dotfiles-setup.sh"
@@ -82,4 +78,9 @@ function pi {
     fi
 
     return 0
+}
+
+## pif: Initializes project. Sublime will open in foreground.
+function pif {
+    pi --foreground
 }

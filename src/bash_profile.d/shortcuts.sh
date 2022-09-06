@@ -7,6 +7,7 @@ function __main {
     alias gd="git diff"
     alias gdc="git diff --cached"
     alias gg="git grep --untracked --line-number"
+    alias gcp="git cherry-pick"
     alias gl="git log"
     alias gm="git commit"
     alias gr="git reset"

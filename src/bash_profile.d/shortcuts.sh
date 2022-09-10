@@ -6,7 +6,7 @@ function __main {
     alias gb="git branch"
     alias gd="git diff"
     alias gdc="git diff --cached"
-    alias gg="git grep --untracked --line-number"
+    alias gg="rg"
     alias gcp="git cherry-pick"
     alias gl="git log"
     alias gm="git commit"

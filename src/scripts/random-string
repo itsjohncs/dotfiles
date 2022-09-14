@@ -50,6 +50,23 @@ def parse_args(args):
             f"of {', '.join(CHARACTER_CLASSES.keys())}"
         ),
     )
+    parser.add_argument(
+        "-i",
+        "--identifier",
+        action="store_const",
+        dest="preset",
+        const="identifier",
+        help="Creates a string matching [A-Za-z][A-Za-z0-9_]*.",
+    )
+    parser.add_argument(
+        "-n",
+        "--filename",
+        "--file-name",
+        action="store_const",
+        dest="preset",
+        const="filename",
+        help="Creates a string matching [A-Za-z0-9-]*.",
+    )
 
     parser.add_argument(
         "length",
@@ -60,16 +77,42 @@ def parse_args(args):
         nargs="?",
     )
 
-    return parser.parse_args(args)
+    parsed_args = parser.parse_args(args)
+    if parsed_args.preset and parsed_args.exclude:
+        parser.error("--exclude cannot be used with a preset")
+
+    return parsed_args
+
+
+def random_string(length, *charset_names, extra=""):
+    characters = set(extra)
+    for i in charset_names:
+        characters.update(CHARACTER_CLASSES[i])
+    charset = "".join(characters)
+
+    return "".join(random.choice(charset) for _ in range(length))
+
+
+def generate_string(parsed_args):
+    length = parsed_args.length
+    match parsed_args.preset:
+        case "identifier":
+            return random_string(1, "letters") + random_string(
+                length - 1, "letters", "digits", extra="_"
+            )
+
+        case "filename":
+            return random_string(length, "letters", "digits", extra="-")
+
+        case None:
+            return random_string(
+                length,
+                *(i for i in CHARACTER_CLASSES if i not in parsed_args.exclude),
+            )
 
 
 def main(parsed_args):
-    charset = ""
-    for k, v in CHARACTER_CLASSES.items():
-        if k not in parsed_args.exclude:
-            charset += v
-
-    print("".join(random.choice(charset) for _ in range(parsed_args.length)))
+    print(generate_string(parsed_args))
 
 
 if __name__ == "__main__":

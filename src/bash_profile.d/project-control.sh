@@ -54,21 +54,6 @@ function pi {
         return 1
     fi
 
-    local SUBLIME_PROJECT
-    SUBLIME_PROJECT="$(
-        find "$PROJECT_DIR" \
-            -maxdepth 1 \
-            -name "*.sublime-project" \
-            -print -quit
-    )"
-    if [[ -f $SUBLIME_PROJECT ]]; then
-        local BACKGROUND_FLAG
-        if [[ ${1:-} != "--foreground" ]]; then
-            BACKGROUND_FLAG=--background
-        fi
-        subl $BACKGROUND_FLAG --project "$SUBLIME_PROJECT"
-    fi
-
     SETUP_SCRIPT="$PROJECT_DIR/.dotfiles-setup.sh"
     if [[ -f $SETUP_SCRIPT ]]; then
         # shellcheck source=/dev/null
@@ -78,9 +63,4 @@ function pi {
     fi
 
     return 0
-}
-
-## pif: Initializes project. Sublime will open in foreground.
-function pif {
-    pi --foreground
 }

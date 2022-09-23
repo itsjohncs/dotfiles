@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+## Opens editor for current project.
+
+set -eu
+
+SEARCH_DIR="$(git rev-parse --show-superproject-working-tree 2> /dev/null || true)"
+if [[ -z $SEARCH_DIR ]]; then
+    SEARCH_DIR="$(git rev-parse --show-toplevel 2> /dev/null || true)"
+fi
+if [[ -z $SEARCH_DIR ]]; then
+    SEARCH_DIR="$PWD"
+fi
+SEARCH_DIR="$(realpath "$SEARCH_DIR")"
+
+VS_CODE_WORKSPACE="$(
+    find "$SEARCH_DIR" \
+        -maxdepth 1 \
+        -name "*.code-workspace" \
+        -print -quit
+)"
+if [[ -f $VS_CODE_WORKSPACE ]]; then
+    set -x
+    exec code "$@" "$VS_CODE_WORKSPACE"
+fi
+
+SUBLIME_PROJECT="$(
+    find "$SEARCH_DIR" \
+        -maxdepth 1 \
+        -name "*.sublime-project" \
+        -print -quit
+)"
+if [[ -f $SUBLIME_PROJECT ]]; then
+    set -x
+    exec subl "$@" --project "$SUBLIME_PROJECT"
+fi
+
+echo "No 'Visual Studio Code' or 'Sublime Text' project file found."

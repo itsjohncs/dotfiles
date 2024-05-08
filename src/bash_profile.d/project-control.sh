@@ -1,23 +1,3 @@
-## p: Opens dev environment for project.
-function p {
-    if [[ $# -eq 0 ]]; then
-        pi
-        return $?
-    elif [[ $# -ne 1 ]]; then
-        echo "$0 PROJECT"
-        echo
-        echo "Opens and prepares dev environment for PROJECT."
-        return 1
-    fi
-
-    pd "$1" || return 1
-    local PROJECT_DIR="$PWD"
-
-    if ! pi 2> /dev/null; then
-        echo "WARNING: Unexpected error while initializing project" >&2
-    fi
-}
-
 ## pd: Changes directory to project.
 function pd {
     if [[ -z $1 ]]; then

@@ -33,4 +33,4 @@ find "$ROOT_DIR" \
     -type f -a -exec bash \
         -c 'shebang_present "#!/usr/bin/env node" "$0"' {} \; \
     -print0 \
-    | xargs -0t npx eslint
+    | xargs -0t npx eslint@8

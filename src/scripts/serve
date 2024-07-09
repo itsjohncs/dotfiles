@@ -16,8 +16,8 @@ function contains {
 
 if contains --port "$@"; then
     set -x
-    npx http-server "$@"
+    npx live-server "$@"
 else
     set -x
-    npx http-server --port 2282 "$@"
+    npx live-server --port=2282 "$@"
 fi

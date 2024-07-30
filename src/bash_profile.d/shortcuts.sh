@@ -10,6 +10,7 @@ function __main {
     alias gcp="git cherry-pick"
     alias gl="git log"
     alias gm="git commit"
+    alias gms="git commit -m 'nopush: squash me'"
     alias gr="git reset"
     alias gs="git status"
     alias gsh="git show"

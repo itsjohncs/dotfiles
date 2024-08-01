@@ -12,6 +12,7 @@ Entry = collections.namedtuple("Entry", ["command", "description", "is_alias"])
 ENTRY_RE = re.compile(r"^(?://)?## (?:([a-zA-Z0-9_-]+): )?(.*)$")
 ALIAS_RE = re.compile(r"^alias ([a-zA-Z0-9_-]+)=[\"'](.+)[\"']$")
 
+
 def parse_entries(path):
     basename = os.path.basename(path)
     with open(path, encoding="utf8") as f:
@@ -24,7 +25,9 @@ def parse_entries(path):
             elif match := ALIAS_RE.match(line):
                 yield Entry(*match.groups(), True)
 
+
 IGNORE = {"complete-alias", "dark-mode-notify", "__pycache__"}
+
 
 def list_files():
     parent_dir = os.path.join(os.path.dirname(__file__), "..")
@@ -34,11 +37,14 @@ def list_files():
             if name not in IGNORE:
                 yield os.path.join(root, name)
 
+
 def style_command(text):
     return f"\x1b[34m{text}\x1b[0m"
 
+
 def style_alias(text):
     return f"\x1b[33m{text}\x1b[0m"
+
 
 def main():
     if len(sys.argv) > 1:
@@ -65,15 +71,17 @@ def main():
                 formatted_description = style_alias(formatted_description)
 
             # pylint: disable-next=consider-using-f-string
-            print("{} {}".format(
-                style_command(command.rjust(longest_name)),
-                formatted_description))
+            print(
+                "{} {}".format(
+                    style_command(command.rjust(longest_name)), formatted_description
+                )
+            )
         else:
             # pylint: disable-next=consider-using-f-string
-            print("{}: {}{}".format(
-                command,
-                "ALIASES " if is_alias else "",
-                description))
+            print(
+                "{}: {}{}".format(command, "ALIASES " if is_alias else "", description)
+            )
+
 
 if __name__ == "__main__":
     main()

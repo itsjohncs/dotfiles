@@ -4,9 +4,9 @@
 
 set -eu
 
-SEARCH_DIR="$(git rev-parse --show-superproject-working-tree 2> /dev/null || true)"
+SEARCH_DIR="$(git rev-parse --show-superproject-working-tree 2>/dev/null || true)"
 if [[ -z $SEARCH_DIR ]]; then
-    SEARCH_DIR="$(git rev-parse --show-toplevel 2> /dev/null || true)"
+    SEARCH_DIR="$(git rev-parse --show-toplevel 2>/dev/null || true)"
 fi
 if [[ -z $SEARCH_DIR ]]; then
     SEARCH_DIR="$PWD"

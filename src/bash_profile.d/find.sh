@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function __supports_local_dash {
-    local - 2> /dev/null
+    local - 2>/dev/null
 }
 
 if __supports_local_dash; then
@@ -9,13 +9,13 @@ if __supports_local_dash; then
         {
             local -
             set +xe
-        } 2> /dev/null
+        } 2>/dev/null
 
         local -a ARGS
         for i in "$@"; do
             if [[ $i =~ -i?regex ]]; then
                 ARGS+=(-regextype posix-extended)
-            elif [[ $i = -regextype ]]; then
+            elif [[ $i == -regextype ]]; then
                 ARGS=("$@")
                 break
             fi
@@ -28,5 +28,5 @@ if __supports_local_dash; then
 
     export -f find
 else
-    echo "WARNING: Version of bash is too old for find shim. Upgrade to >=4.4." 2> /dev/null
+    echo "WARNING: Version of bash is too old for find shim. Upgrade to >=4.4." 2>/dev/null
 fi

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
 # Check if we're on a non-mac system.
-if ! command -v osascript > /dev/null; then
+if ! command -v osascript >/dev/null; then
     return
 fi
 
-if ! command -v dark-mode > /dev/null; then
+if ! command -v dark-mode >/dev/null; then
     echo "WARNING: Could not find dark-mode." >&2
     return 1
 fi

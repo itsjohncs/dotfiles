@@ -13,8 +13,8 @@ DRY_RUN=false
 DURATION=""
 while [[ $# -gt 0 ]]; do
     case $1 in
-        --dry-run|-d) DRY_RUN=true ;;
-        *) DURATION="$DURATION $1" ;;
+    --dry-run | -d) DRY_RUN=true ;;
+    *) DURATION="$DURATION $1" ;;
     esac
     shift
 done

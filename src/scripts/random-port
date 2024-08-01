@@ -10,4 +10,3 @@ if [[ $# -ne 0 ]]; then
 fi
 
 python3 -c "import random; print(random.randint(1024, 65536))"
-

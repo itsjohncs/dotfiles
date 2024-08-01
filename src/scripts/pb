@@ -12,9 +12,10 @@ if [[ $# -ne 0 ]]; then
 fi
 
 URL="$(nc termbin.com 9999 | tr -d "\0")"
-cb <<< "$URL"
+cb <<<"$URL"
 echo "$URL (copied to clipboard)"
 
 PRETTY_URL="$(
-    sed "s/\/termbin.com/\/l.termbin.com/g" <<< "$URL")"
+    sed "s/\/termbin.com/\/l.termbin.com/g" <<<"$URL"
+)"
 echo "Highlighted version at $PRETTY_URL"

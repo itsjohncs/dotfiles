@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2016
 
 ## Checkout PR from GitHub.
 
@@ -7,8 +8,8 @@ set -eu
 if [[ $# -eq 0 || $# -gt 2 ]]; then
     echo "$0 PR_NUMBER [remote]"
     echo
-    echo "Checks out GitHub PR #\$PR_NUMBER from the given remote. The new"
-    echo "branch will be named pr-\$PR_NUMBER."
+    echo 'Checks out GitHub PR #$PR_NUMBER from the given remote. The new'
+    echo 'branch will be named pr-$PR_NUMBER.'
     echo
     echo "If remote is unspecified, it will default to upstream, and then"
     echo "origin if there's no upstream remote."
@@ -16,7 +17,7 @@ if [[ $# -eq 0 || $# -gt 2 ]]; then
 fi
 
 function remote_exists {
-    git remote get-url "$1" > /dev/null 2>&1
+    git remote get-url "$1" >/dev/null 2>&1
 }
 
 REMOTE="${2-}"

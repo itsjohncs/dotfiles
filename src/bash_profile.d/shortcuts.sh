@@ -19,7 +19,7 @@ function __main {
     alias t="TIMCOL_NAME=t timcol"
 
     local SCRIPT_DIR
-    SCRIPT_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P )"
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 
     # Aliases are used instead of symbolic links because cygwin doesn't support
     # them. The shellcheck disable directives are because of a warning about

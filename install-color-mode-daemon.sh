@@ -2,14 +2,17 @@
 
 set -eo pipefail
 
-SCRIPT_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1 ; pwd -P )"
+SCRIPT_DIR="$(
+    cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
+    pwd -P
+)"
 
 swiftc "$SCRIPT_DIR/src/dark-mode-notify/dark-mode-notify.swift" \
-       -o "$HOMEBREW_PREFIX/bin/dark-mode-notify"
+    -o "$HOMEBREW_PREFIX/bin/dark-mode-notify"
 
 mkdir -p "$HOMEBREW_PREFIX/var/log/dark-mode-notify"
 
-cat > "$HOME/Library/LaunchAgents/ke.bou.dark-mode-notify.plist" << EOM
+cat >"$HOME/Library/LaunchAgents/ke.bou.dark-mode-notify.plist" <<EOM
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
 "http://www.apple.com/DTDs/PropertyList-1.0.dtd">

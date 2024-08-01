@@ -29,7 +29,7 @@ mapfile -d "" -t FILES < <(
         )
 )
 
-if [[ ${1-} = -c || ( ${1-} != -p && -t 1 ) ]]; then
+if [[ ${1-} == -c || (${1-} != -p && -t 1) ]]; then
     printf "%q " "${FILES[@]}" | cb
     echo "Copied ${#FILES[@]} file names."
 elif [[ ${#FILES[@]} -ne 0 ]]; then

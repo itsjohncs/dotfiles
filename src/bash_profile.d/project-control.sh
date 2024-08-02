@@ -14,7 +14,6 @@ function pd {
 
         cd "$CURRENT_PROJECT_ROOT" || return 1
     else
-        local PROJECT_DIR="$HOME/personal/$1"
         cd "$HOME/personal/$1" || return 1
     fi
 }

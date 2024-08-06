@@ -10,10 +10,12 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 fi
 
 DRY_RUN=false
+OPERATOR=-
 DURATION=""
 while [[ $# -gt 0 ]]; do
     case $1 in
     --dry-run | -d) DRY_RUN=true ;;
+    --future | -f) OPERATOR=+ ;;
     *) DURATION="$DURATION $1" ;;
     esac
     shift
@@ -21,13 +23,13 @@ done
 
 if [[ -z $DURATION ]]; then
     echo "Error: Duration not provided." >&2
-    echo "Usage: $0 [--dry-run|-d] <duration>" >&2
+    echo "Usage: $0 [--dry-run|-d] [--future|-f] <duration>" >&2
     exit 1
 fi
 
 GIT_TIMESTAMP="$(git show -s --format=%ci HEAD)"
 
-if ! NEW_TIMESTAMP="$(date -d "$GIT_TIMESTAMP - $DURATION" +"%Y-%m-%d %T %z")"; then
+if ! NEW_TIMESTAMP="$(date -d "$GIT_TIMESTAMP $OPERATOR $DURATION" +"%Y-%m-%d %T %z")"; then
     echo "Error: Invalid duration format. Please use a format like '3 hours', '1 day', or '5 minutes'." >&2
     exit 1
 fi

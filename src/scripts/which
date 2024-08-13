@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+
+import argparse
+import os
+import sys
+
+
+def decorated_path(path):
+    flags = []
+    if not os.access(path, os.X_OK):
+        flags.append("not executable")
+
+    if flags:
+        return f"{path} {', '.join(flags)}"
+    else:
+        return path
+
+
+def follow_symlinks(path):
+    while os.path.islink(path):
+        link = os.readlink(path)
+        if not os.path.isabs(link):
+            path = os.path.join(os.path.dirname(path), link)
+        else:
+            path = link
+        print(f"-> {decorated_path(path)}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Find executables in PATH")
+    parser.add_argument(
+        "-a", action="store_true", help="Show all matching executables in PATH"
+    )
+    parser.add_argument("command", help="Command to search for")
+    args = parser.parse_args()
+
+    path_dirs = os.environ.get("PATH", "").split(os.pathsep)
+    found = False
+
+    for directory in path_dirs:
+        command_path = os.path.join(directory, args.command)
+        if os.path.isfile(command_path) and os.access(command_path, os.X_OK):
+            found = True
+            print(decorated_path(command_path))
+            follow_symlinks(command_path)
+            if not args.a:
+                break
+
+    if not found:
+        print(f"{args.command} not found in PATH")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

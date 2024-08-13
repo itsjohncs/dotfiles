@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ $# -eq 0 ]]; then
+    echo "Usage: $0 <commit> [<branch>]" >&2
+    exit 1
+fi
+
+SCRIPT_DIR="$(
+    cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
+    pwd -P
+)"
+
+MERGE=$("$SCRIPT_DIR/find-merge" "$@")
+
+if [[ -n $MERGE ]]; then
+    git show "$MERGE"
+else
+    echo "No merge commit found."
+fi

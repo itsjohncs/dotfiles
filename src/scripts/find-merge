@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ $# -eq 0 ]]; then
+    echo "Usage: $0 <commit> [<branch>]" >&2
+    exit 1
+fi
+
+COMMIT=$1
+BRANCH=${2:-HEAD}
+
+(
+    git rev-list "$COMMIT..$BRANCH" --ancestry-path | cat -n
+    git rev-list "$COMMIT..$BRANCH" --first-parent | cat -n
+) | sort -k2 -s | uniq -f1 -d | sort -n | tail -1 | cut -f2

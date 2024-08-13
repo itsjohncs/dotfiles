@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+## Show the merge commit that merged in given commit.
+
 set -euo pipefail
 
 if [[ $# -eq 0 ]]; then

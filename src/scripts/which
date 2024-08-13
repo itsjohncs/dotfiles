@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+## Find executable in path (following symlinks).
+
 import argparse
 import os
 import sys

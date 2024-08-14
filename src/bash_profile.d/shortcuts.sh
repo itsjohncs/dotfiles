@@ -14,6 +14,7 @@ function __main {
     alias gr="git reset"
     alias gs="git status"
     alias gsh="git show"
+    alias gff="git merge --ff-only"
     alias mk="cowsay 'Hi! I love you 💞' && clear"
     alias pre="open -a Preview.app"
     alias t="TIMCOL_NAME=t timcol"

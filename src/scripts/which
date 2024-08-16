@@ -42,7 +42,7 @@ def parse_alias(alias: str) -> str | None:
     return None
 
 
-def get_command(query: str) -> str:
+def get_command(query: str) -> tuple[str, str | None]:
     if query.startswith("alias") and any(
         char in query for char in ["&&", ";", "|", "if", "(", ")"]
     ):
@@ -50,9 +50,9 @@ def get_command(query: str) -> str:
 
     parsed = parse_alias(query)
     if parsed:
-        return parsed
+        return (query, parsed)
 
-    return query
+    return (query, None)
 
 
 def main():
@@ -69,11 +69,20 @@ def main():
         help="Command to search for. Also accepts aliases syntax from `command -v`.",
     )
     args = parser.parse_args()
+
+    query, parsed_alias = args.command
+
+    if parsed_alias:
+        print(f"{query} -> {parsed_alias}")
+        print()
+
+    command = parsed_alias or query
+
     path_dirs = os.environ.get("PATH", "").split(os.pathsep)
     found = False
 
     for directory in path_dirs:
-        command_path = os.path.join(directory, args.command)
+        command_path = os.path.join(directory, command)
         if os.path.isfile(command_path) and os.access(command_path, os.X_OK):
             found = True
             print(decorated_path(command_path))
@@ -83,7 +92,7 @@ def main():
                 break
 
     if not found:
-        print(f"{args.command} not found in PATH")
+        print(f"{command} not found in PATH")
         sys.exit(1)
 
 

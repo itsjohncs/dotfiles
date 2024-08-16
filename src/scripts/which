@@ -5,6 +5,8 @@
 import argparse
 import os
 import sys
+import re
+import shlex
 
 
 def decorated_path(path):
@@ -28,6 +30,31 @@ def follow_symlinks(path):
         print(f"-> {decorated_path(path)}")
 
 
+def parse_alias(alias: str) -> str | None:
+    match = re.match(r"alias\s+\w+='(.+)'", alias)
+    if match:
+        command = match.group(1).strip()
+        parts = shlex.split(command)
+        # Skip environment variables and find the first command
+        for part in parts:
+            if "=" not in part:
+                return part
+    return None
+
+
+def get_command(query: str) -> str:
+    if query.startswith("alias") and any(
+        char in query for char in ["&&", ";", "|", "if", "(", ")"]
+    ):
+        raise ValueError("Complex aliases are not supported")
+
+    parsed = parse_alias(query)
+    if parsed:
+        return parsed
+
+    return query
+
+
 def main():
     parser = argparse.ArgumentParser(description="Find executables in PATH")
     parser.add_argument(
@@ -36,9 +63,12 @@ def main():
     parser.add_argument(
         "-n", "--no-symlinks", action="store_true", help="Disable symlink following"
     )
-    parser.add_argument("command", help="Command to search for")
+    parser.add_argument(
+        "command",
+        type=get_command,
+        help="Command to search for. Also accepts aliases syntax from `command -v`.",
+    )
     args = parser.parse_args()
-
     path_dirs = os.environ.get("PATH", "").split(os.pathsep)
     found = False
 

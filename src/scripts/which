@@ -58,7 +58,7 @@ def get_command(query: str) -> tuple[str, str | None]:
 def main():
     parser = argparse.ArgumentParser(description="Find executables in PATH")
     parser.add_argument(
-        "-a", action="store_true", help="Show all matching executables in PATH"
+        "-a", "--all", action="store_true", help="Show all matching executables in PATH"
     )
     parser.add_argument(
         "-n", "--no-symlinks", action="store_true", help="Disable symlink following"
@@ -88,7 +88,7 @@ def main():
             print(decorated_path(command_path))
             if not args.no_symlinks:
                 follow_symlinks(command_path)
-            if not args.a:
+            if not args.all:
                 break
 
     if not found:

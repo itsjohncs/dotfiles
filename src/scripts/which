@@ -81,7 +81,7 @@ def main():
     path_dirs = os.environ.get("PATH", "").split(os.pathsep)
     found = False
 
-    for directory in path_dirs:
+    for directory in set(path_dirs):
         command_path = os.path.join(directory, command)
         if os.path.isfile(command_path) and os.access(command_path, os.X_OK):
             found = True

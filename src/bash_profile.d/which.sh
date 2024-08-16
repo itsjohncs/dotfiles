@@ -4,6 +4,12 @@ function which {
     elif [[ ${*: -1} == -* ]]; then
         command which "$@"
     else
-        command which "${@:1:$#-1}" "$(command -v "${@: -1}")"
+        local CMD_OUTPUT
+        CMD_OUTPUT=$(command -v "${@: -1}")
+        if [[ $CMD_OUTPUT == alias* ]]; then
+            command which "${@:1:$#-1}" "$CMD_OUTPUT"
+        else
+            command which "$@"
+        fi
     fi
 }

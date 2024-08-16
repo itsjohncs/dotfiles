@@ -35,4 +35,19 @@ if [[ -f $SUBLIME_PROJECT ]]; then
     exec subl "$@" --project "$SUBLIME_PROJECT"
 fi
 
-echo "No 'Visual Studio Code' or 'Sublime Text' project file found."
+DIR_NAME=$(basename "$SEARCH_DIR")
+NEW_WORKSPACE="$SEARCH_DIR/$DIR_NAME.code-workspace"
+cat >"$NEW_WORKSPACE" <<EOF
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {}
+}
+EOF
+
+echo "notice: created new VS Code workspace at \`$NEW_WORKSPACE\`"
+set -x
+exec code "$@" "$NEW_WORKSPACE"

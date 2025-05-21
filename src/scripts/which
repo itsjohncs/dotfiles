@@ -7,6 +7,7 @@ import os
 import sys
 import re
 import shlex
+from typing import Union
 
 
 def decorated_path(path):
@@ -30,7 +31,7 @@ def follow_symlinks(path):
         print(f"-> {decorated_path(path)}")
 
 
-def parse_alias(alias: str) -> str | None:
+def parse_alias(alias: str) -> Union[str, None]:
     match = re.match(r"alias\s+\w+='(.+)'", alias)
     if match:
         command = match.group(1).strip()
@@ -42,7 +43,7 @@ def parse_alias(alias: str) -> str | None:
     return None
 
 
-def get_command(query: str) -> tuple[str, str | None]:
+def get_command(query: str) -> tuple[str, Union[str, None]]:
     if query.startswith("alias") and any(
         char in query for char in ["&&", ";", "|", "if", "(", ")"]
     ):

@@ -4,7 +4,6 @@ function __main {
     fi
 
     local ENABLED=(
-        git-completion.bash
         brew
     )
 

@@ -4,6 +4,12 @@ function __main {
 
     export PATH="$SCRIPT_DIR/src/scripts/:$PATH"
 
+    # Entry point for installed https://github.com/scop/bash-completion
+    if [[ -r ${JCS_BASH_COMPLETION_ENTRY_POINT-} ]]; then
+        # shellcheck source=/dev/null
+        source "$JCS_BASH_COMPLETION_ENTRY_POINT"
+    fi
+
     for i in "$SCRIPT_DIR"/src/bash_profile.d/*; do
         # shellcheck source=/dev/null
         source "$i"
@@ -14,11 +20,7 @@ function __main {
         source "$i"
     done
 
-    # Entry point for installed https://github.com/scop/bash-completion
     if [[ -r ${JCS_BASH_COMPLETION_ENTRY_POINT-} ]]; then
-        # shellcheck source=/dev/null
-        source "$JCS_BASH_COMPLETION_ENTRY_POINT"
-
         # shellcheck source=/dev/null
         source "$SCRIPT_DIR/src/complete-alias/complete_alias"
 

@@ -25,8 +25,6 @@ if __supports_local_dash; then
 
         command find "${ARGS[@]}"
     }
-
-    export -f find
 else
     echo "WARNING: Version of bash is too old for find shim. Upgrade to >=4.4." 2>/dev/null
 fi

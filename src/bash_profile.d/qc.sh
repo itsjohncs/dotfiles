@@ -51,6 +51,14 @@ qc() {
         return 2
     fi
 
+    # Check if llm is installed
+    if ! command -v llm >/dev/null 2>&1; then
+        echo "qc: 'llm' command not found" >&2
+        echo "Install with: uv tool install llm" >&2
+        echo "Then install the extension: llm install llm-cmd-comp" >&2
+        return 1
+    fi
+
     local cmd
     if ! cmd="$(llm cmdcomp "$*")"; then
         return 1

@@ -9,7 +9,7 @@ qc() {
     fi
 
     local cmd
-    if ! cmd="$(llm cmdcomp --model gpt-5 "$*")"; then
+    if ! cmd="$(llm cmdcomp "$*")"; then
         return 1
     fi
 

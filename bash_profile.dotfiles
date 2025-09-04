@@ -4,8 +4,6 @@ function __main {
     local SCRIPT_DIR
     SCRIPT_DIR="$( cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P )"
 
-    export PATH="$SCRIPT_DIR/src/scripts/:$PATH"
-
     # Entry point for installed https://github.com/scop/bash-completion
     if [[ -r ${JCS_BASH_COMPLETION_ENTRY_POINT-} ]]; then
         # shellcheck source=/dev/null

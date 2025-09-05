@@ -7,7 +7,7 @@ set -euo pipefail
 usage() {
     echo "Usage: gi [TARGET]"
     echo "Run 'git rebase -i TARGET'."
-    echo "If TARGET is not provided, uses the upstream of the current branch if set; otherwise defaults to 'origin/main'."
+    echo "If TARGET is not provided, prefers branch.<name>.base (if set); else uses the upstream of the current branch; otherwise uses the merge-base of 'origin/main' and 'HEAD'."
 }
 
 if [[ ${1-} == "-h" || ${1-} == "--help" ]]; then
@@ -31,12 +31,20 @@ fi
 if [[ $# -eq 1 ]]; then
     TARGET="$1"
 else
-    # Try to get the upstream of the current branch
-    upstream="$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)"
-    if [[ -n ${upstream:-} ]]; then
-        TARGET="$upstream"
+    # Prefer per-branch 'base' if configured (via src/scripts/base)
+    base_cfg="$(base 2>/dev/null || true)"
+
+    if [[ -n ${base_cfg:-} ]]; then
+        TARGET="$base_cfg"
     else
-        TARGET="origin/main"
+        # Try to get the upstream of the current branch
+        upstream="$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null || true)"
+        if [[ -n ${upstream:-} ]]; then
+            TARGET="$upstream"
+        else
+            # Use the merge base between origin/main and the current HEAD
+            TARGET="$(git merge-base origin/main HEAD)"
+        fi
     fi
 fi
 

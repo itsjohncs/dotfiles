@@ -2,9 +2,33 @@
 set -euo pipefail
 
 ## Create a new branch initialized to origin/main.
+## Options:
+##   -b   After creating the branch, set branch.<new>.base to the branch we started from.
+##   -h   Show help.
+
+usage() {
+    echo "Usage: $(basename "$0") [-b] <branch-name>" >&2
+}
+
+SET_BASE=0
+while getopts ":bh" opt; do
+    case "$opt" in
+    b) SET_BASE=1 ;;
+    h)
+        usage
+        exit 0
+        ;;
+    \?)
+        echo "Error: invalid option -$OPTARG" >&2
+        usage
+        exit 2
+        ;;
+    esac
+done
+shift $((OPTIND - 1))
 
 if [[ $# -ne 1 ]]; then
-    echo "Usage: $(basename "$0") <branch-name>" >&2
+    usage
     exit 2
 fi
 
@@ -37,10 +61,18 @@ if ! git show-ref --verify --quiet "refs/remotes/origin/main"; then
     exit 1
 fi
 
+# Remember the branch we're currently on (to optionally set as base)
+PREV_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+
 echo "Creating branch '${BRANCH}'..."
 git switch -c "${BRANCH}"
 
 echo "Hard resetting '${BRANCH}' to 'origin/main'..."
 git reset --hard origin/main
+
+if [[ $SET_BASE -eq 1 ]]; then
+    base "$PREV_BRANCH"
+    echo "Set branch.${BRANCH}.base=${PREV_BRANCH}"
+fi
 
 echo "Branch '${BRANCH}' created and set to 'origin/main'."

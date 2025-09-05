@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Manage a per-branch "base" setting using git config.
+# - No arguments: print current branch's base and exit 0 if set; exit 1 if unset.
+# - One argument: set current branch's base to the provided value.
+
+usage() {
+    echo "Usage: $(basename "$0") [<base-branch>]"
+    echo "Without args: prints the current branch's configured base (branch.<name>.base)."
+    echo "With one arg: sets branch.<name>.base to the given base-branch."
+}
+
+if [[ ${1-} == "-h" || ${1-} == "--help" ]]; then
+    usage
+    exit 0
+fi
+
+# Ensure we're inside a git repository
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Error: not inside a git repository." >&2
+    exit 1
+fi
+
+# Ensure we're on a named branch (not detached HEAD)
+current_branch="$(git rev-parse --abbrev-ref HEAD)"
+if [[ $current_branch == "HEAD" ]]; then
+    echo "Error: currently in a detached HEAD state. Checkout a branch first." >&2
+    exit 1
+fi
+
+case "$#" in
+0)
+    if base_val="$(git config --get "branch.${current_branch}.base" 2>/dev/null)"; then
+        echo "$base_val"
+        exit 0
+    else
+        # No base configured
+        exit 1
+    fi
+    ;;
+1)
+    base_branch="$1"
+    git config "branch.${current_branch}.base" "$base_branch"
+    echo "Set branch.${current_branch}.base=${base_branch}"
+    ;;
+*)
+    usage >&2
+    exit 2
+    ;;
+esac

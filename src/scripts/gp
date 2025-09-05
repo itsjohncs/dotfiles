@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+## `git push`. Also prints out `pr-url`.
+
+git push "$@"
+
+# Print the PR URL determined by pr-url
+if url="$(pr-url 2>/dev/null)"; then
+    echo "$url"
+else
+    echo "Note: pr-url could not determine a PR URL." >&2
+fi

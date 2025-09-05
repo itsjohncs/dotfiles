@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Print a GitHub URL to open a PR for the current branch.
+# - If a per-branch base is configured (via `base` script), print the compare URL with base...head.
+# - If no base is set, print the default /pull/new/HEAD URL.
+#
+# Examples:
+#   With base set: https://github.com/OWNER/REPO/compare/BASE...HEAD?expand=1
+#   Without base:  https://github.com/OWNER/REPO/pull/new/HEAD
+
+# Ensure we're inside a git repository
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Error: not inside a git repository." >&2
+    exit 1
+fi
+
+# Determine current branch
+branch="$(git rev-parse --abbrev-ref HEAD)"
+if [[ $branch == "HEAD" ]]; then
+    echo "Error: currently in a detached HEAD state." >&2
+    exit 1
+fi
+
+# Get origin URL
+remote_url="$(git remote get-url --push origin 2>/dev/null || git remote get-url origin 2>/dev/null || true)"
+if [[ -z $remote_url ]]; then
+    echo "Error: could not determine 'origin' remote URL." >&2
+    exit 1
+fi
+
+# Parse owner/repo from origin URL (support SSH and HTTPS)
+owner=""
+repo=""
+if [[ $remote_url =~ ^git@github\.com:([^/]+)/([^/]+)(\.git)?/?$ ]]; then
+    owner="${BASH_REMATCH[1]}"
+    repo="${BASH_REMATCH[2]}"
+elif [[ $remote_url =~ ^https://github\.com/([^/]+)/([^/]+)(\.git)?/?$ ]]; then
+    owner="${BASH_REMATCH[1]}"
+    repo="${BASH_REMATCH[2]}"
+else
+    echo "Error: unsupported or non-GitHub origin URL: $remote_url" >&2
+    exit 1
+fi
+
+# Ensure repo name does not carry a trailing .git
+repo="${repo%.git}"
+
+# Prefer per-branch base via `base` script; if not set, fall back to /pull/new
+base_branch="$(base 2>/dev/null || true)"
+
+if [[ -n ${base_branch:-} ]]; then
+    echo "https://github.com/${owner}/${repo}/compare/${base_branch}...${branch}?expand=1"
+else
+    echo "https://github.com/${owner}/${repo}/pull/new/${branch}"
+fi

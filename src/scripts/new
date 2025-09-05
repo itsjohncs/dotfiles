@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+## Create a new branch initialized to origin/main.
+
+if [[ $# -ne 1 ]]; then
+    echo "Usage: $(basename "$0") <branch-name>" >&2
+    exit 2
+fi
+
+BRANCH="$1"
+
+# Ensure we're in a git work tree
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    echo "Error: not inside a git repository." >&2
+    exit 1
+fi
+
+# Abort if there are unstaged changes (working tree differs from index)
+if ! git diff --quiet; then
+    echo "Error: unstaged changes detected. Please stash or commit them before running 'new'." >&2
+    exit 1
+fi
+
+# Check if branch already exists locally
+if git show-ref --verify --quiet "refs/heads/${BRANCH}"; then
+    echo "Branch '${BRANCH}' already exists. Nothing to do."
+    exit 0
+fi
+
+echo "Fetching from origin..."
+git fetch origin
+
+# Ensure origin/main exists
+if ! git show-ref --verify --quiet "refs/remotes/origin/main"; then
+    echo "Error: 'origin/main' not found after fetch." >&2
+    exit 1
+fi
+
+echo "Creating branch '${BRANCH}'..."
+git switch -c "${BRANCH}"
+
+echo "Hard resetting '${BRANCH}' to 'origin/main'..."
+git reset --hard origin/main
+
+echo "Branch '${BRANCH}' created and set to 'origin/main'."

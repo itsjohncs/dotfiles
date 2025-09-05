@@ -4,11 +4,15 @@ set -euo pipefail
 # Manage a per-branch "base" setting using git config.
 # - No arguments: print current branch's base and exit 0 if set; exit 1 if unset.
 # - One argument: set current branch's base to the provided value.
+# - Two arguments: set TARGET branch's base to NEW_BASE (i.e., base TARGET NEW_BASE).
 
 usage() {
-    echo "Usage: $(basename "$0") [<base-branch>]"
-    echo "Without args: prints the current branch's configured base (branch.<name>.base)."
-    echo "With one arg: sets branch.<name>.base to the given base-branch."
+    echo "Usage:"
+    echo "  $(basename "$0") [<base-branch>]"
+    echo "      Without args: prints the current branch's configured base (branch.<name>.base)."
+    echo "      With one arg: sets branch.<name>.base to the given base-branch."
+    echo "  $(basename "$0") <target-branch> <base-branch>"
+    echo "      With two args: sets branch.<target-branch>.base to the given base-branch."
 }
 
 if [[ ${1-} == "-h" || ${1-} == "--help" ]]; then
@@ -43,6 +47,12 @@ case "$#" in
     base_branch="$1"
     git config "branch.${current_branch}.base" "$base_branch"
     echo "Set branch.${current_branch}.base=${base_branch}"
+    ;;
+2)
+    target_branch="$1"
+    new_base="$2"
+    git config "branch.${target_branch}.base" "$new_base"
+    echo "Set branch.${target_branch}.base=${new_base}"
     ;;
 *)
     usage >&2

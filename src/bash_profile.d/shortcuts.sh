@@ -16,9 +16,12 @@ function __main {
     alias gsh="git show"
     alias gff="git merge --ff-only"
     alias gfo="git fetch origin"
+
     alias mk="cowsay 'Hi! I love you 💞' && clear"
     alias pre="open -a Preview.app"
     alias t="TIMCOL_NAME=t timcol"
+
+    alias aig="aider --model gpt-5 --reasoning low"
 
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"

@@ -52,13 +52,15 @@ if git show-ref --verify --quiet "refs/heads/${BRANCH}"; then
     exit 0
 fi
 
-echo "Fetching from origin..."
-git fetch origin
+if [[ $SET_BASE -eq 0 ]]; then
+    echo "Fetching from origin..."
+    git fetch origin
 
-# Ensure origin/main exists
-if ! git show-ref --verify --quiet "refs/remotes/origin/main"; then
-    echo "Error: 'origin/main' not found after fetch." >&2
-    exit 1
+    # Ensure origin/main exists
+    if ! git show-ref --verify --quiet "refs/remotes/origin/main"; then
+        echo "Error: 'origin/main' not found after fetch." >&2
+        exit 1
+    fi
 fi
 
 # Remember the branch we're currently on (to optionally set as base)
@@ -67,12 +69,13 @@ PREV_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 echo "Creating branch '${BRANCH}'..."
 git switch -c "${BRANCH}"
 
-echo "Hard resetting '${BRANCH}' to 'origin/main'..."
-git reset --hard origin/main
-
 if [[ $SET_BASE -eq 1 ]]; then
+    # When -b is used, stay on current branch (don't reset to origin/main)
     base "$PREV_BRANCH"
     echo "Set branch.${BRANCH}.base=${PREV_BRANCH}"
+    echo "Branch '${BRANCH}' created from '${PREV_BRANCH}'."
+else
+    echo "Hard resetting '${BRANCH}' to 'origin/main'..."
+    git reset --hard origin/main
+    echo "Branch '${BRANCH}' created and set to 'origin/main'."
 fi
-
-echo "Branch '${BRANCH}' created and set to 'origin/main'."

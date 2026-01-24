@@ -18,13 +18,8 @@ for ITEM in "${UVDIR}"/*; do
     DEST="${LOCALBIN}/python${MINORVERSION}"
 
     if [[ -L ${DEST} ]]; then
-        if [[ -e ${DEST} ]]; then
-            echo "${DEST} already exists and is valid. Nothing to do."
-            continue
-        else
-            echo "${DEST} already exists but is broken. Removing."
-            rm "${DEST}"
-        fi
+        echo "${DEST} already exists. Removing."
+        rm "${DEST}"
     fi
 
     rm -rf "${DEST}"
@@ -37,13 +32,8 @@ LATESTPYTHON=$(uv python find)
 DEST="${LOCALBIN}/python"
 
 if [[ -L ${DEST} ]]; then
-    if [[ -e ${DEST} ]]; then
-        echo "${DEST} already exists and is valid. Nothing to do."
-        exit
-    else
-        echo "${DEST} already exists but is broken. Removing."
-        rm "${DEST}"
-    fi
+    echo "${DEST} already exists. Removing."
+    rm "${DEST}"
 fi
 
 rm -rf "${DEST}"

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Claude Code status line script.
+# Receives session JSON on stdin, outputs status text.
+# Configured via ~/.claude/settings.json:
+#   "statusLine": {"type": "command", "command": "claude-statusline"}
+
+input=$(cat)
+
+worktree=$(echo "$input" | jq -r '.worktree.name // empty')
+cwd=$(echo "$input" | jq -r '.workspace.current_dir // empty')
+
+parts=()
+if [[ -n $worktree ]]; then
+    parts+=("wt:$worktree")
+elif [[ -n $cwd ]]; then
+    parts+=("$(basename "$cwd")")
+fi
+
+echo "${parts[*]}"

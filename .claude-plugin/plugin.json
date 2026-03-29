@@ -1,0 +1,8 @@
+{
+  "name": "dotfiles",
+  "description": "Personal dotfiles plugin — healthcheck, status line, and bootstrap utilities",
+  "version": "1.0.0",
+  "author": {
+    "name": "John Sullivan"
+  }
+}

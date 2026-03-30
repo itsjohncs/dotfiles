@@ -1,0 +1,159 @@
+#!/usr/bin/env bash
+
+## pw — Launch and control Playwright browser instances.
+##
+## Usage: pw launch [--headless]   Start a new browser, print its port
+##        pw <port> <tool> [json]  Call a Playwright tool
+##        pw <port> close          Close browser and server
+##        pw cleanup               Kill all stale sessions
+##        pw install               Install Chromium browser binary
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SESSION_DIR="/tmp/pw-sessions"
+
+cleanup_stale() {
+    [ -d "$SESSION_DIR" ] || return 0
+    for f in "$SESSION_DIR"/*.json; do
+        [ -f "$f" ] || continue
+        local pid
+        pid=$(jq -r '.pid' "$f" 2>/dev/null) || continue
+        if ! kill -0 "$pid" 2>/dev/null; then
+            rm -f "$f"
+        fi
+    done
+}
+
+cmd_launch() {
+    cleanup_stale
+    mkdir -p "$SESSION_DIR"
+
+    local ready_file
+    ready_file=$(mktemp "${TMPDIR:-/tmp}/pw-ready.XXXXXX")
+    rm -f "$ready_file"
+
+    PW_READY_FILE="$ready_file" nohup node "$SCRIPT_DIR/pw-server.mjs" "$@" \
+        </dev/null >/dev/null 2>/dev/null &
+    local server_pid=$!
+    disown "$server_pid" 2>/dev/null || true
+
+    local port=""
+    for _ in $(seq 1 120); do
+        if ! kill -0 "$server_pid" 2>/dev/null; then
+            rm -f "$ready_file"
+            echo "Error: Server process exited unexpectedly" >&2
+            exit 1
+        fi
+        if [ -f "$ready_file" ]; then
+            port=$(cat "$ready_file")
+            rm -f "$ready_file"
+            break
+        fi
+        sleep 0.5
+    done
+
+    if [ -z "$port" ]; then
+        kill "$server_pid" 2>/dev/null || true
+        rm -f "$ready_file"
+        echo "Error: Server failed to start within 60 seconds" >&2
+        exit 1
+    fi
+
+    echo "$port"
+}
+
+cmd_close() {
+    local port=$1
+
+    # Send shutdown command
+    printf '{"tool":"__shutdown"}' |
+        curl -s -X POST "http://127.0.0.1:$port" \
+            -H "Content-Type: application/json" \
+            -d @- >/dev/null 2>&1 || true
+
+    # Wait for process to exit, force kill if needed
+    if [ -f "$SESSION_DIR/$port.json" ]; then
+        local pid
+        pid=$(jq -r '.pid' "$SESSION_DIR/$port.json" 2>/dev/null) || true
+        if [ -n "$pid" ]; then
+            for _ in 1 2 3 4 5 6; do
+                kill -0 "$pid" 2>/dev/null || break
+                sleep 0.5
+            done
+            kill -9 "$pid" 2>/dev/null || true
+        fi
+        rm -f "$SESSION_DIR/$port.json"
+    fi
+
+    echo "Browser session closed"
+}
+
+cmd_tool() {
+    local port=$1
+    local tool=$2
+    local args='{}'
+    [ $# -ge 3 ] && args="$3"
+
+    printf '{"tool":"%s","args":%s}' "$tool" "$args" |
+        curl -s -X POST "http://127.0.0.1:$port" \
+            -H "Content-Type: application/json" \
+            -d @-
+    echo # Ensure trailing newline
+}
+
+cmd_cleanup() {
+    [ -d "$SESSION_DIR" ] || {
+        echo "No sessions to clean up"
+        return
+    }
+    local count=0
+    for f in "$SESSION_DIR"/*.json; do
+        [ -f "$f" ] || continue
+        local pid port
+        pid=$(jq -r '.pid' "$f" 2>/dev/null) || continue
+        port=$(jq -r '.port' "$f" 2>/dev/null) || continue
+        kill "$pid" 2>/dev/null || true
+        rm -f "$f"
+        echo "Killed session on port $port (pid $pid)"
+        count=$((count + 1))
+    done
+    echo "Cleaned up $count session(s)"
+}
+
+cmd_install() {
+    npx --yes playwright install chromium
+}
+
+cmd_help() {
+    grep '^##' "$0" | sed 's/^## \?//'
+}
+
+main() {
+    case "${1:-help}" in
+    launch)
+        shift
+        cmd_launch "$@"
+        ;;
+    cleanup) cmd_cleanup ;;
+    install) cmd_install ;;
+    help | -h | --help) cmd_help ;;
+    *)
+        local port="$1"
+        local tool="${2:-}"
+        if [ -z "$tool" ]; then
+            cmd_help >&2
+            exit 1
+        fi
+        shift 2
+
+        if [ "$tool" = "close" ]; then
+            cmd_close "$port"
+        else
+            cmd_tool "$port" "$tool" "$@"
+        fi
+        ;;
+    esac
+}
+
+main "$@"

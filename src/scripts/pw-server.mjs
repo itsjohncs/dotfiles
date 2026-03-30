@@ -17,8 +17,10 @@ fs.mkdirSync(SESSION_DIR, { recursive: true });
 
 // --- MCP subprocess ---
 
+const isolated = !process.argv.includes("--persist");
 const mcpArgs = ["--yes", "@playwright/mcp@latest"];
 if (headless) mcpArgs.push("--headless");
+if (isolated) mcpArgs.push("--isolated");
 
 const mcp = spawn("npx", mcpArgs, {
   stdio: ["pipe", "pipe", "inherit"],

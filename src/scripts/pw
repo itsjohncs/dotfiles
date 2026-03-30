@@ -2,11 +2,14 @@
 
 ## pw — Launch and control Playwright browser instances.
 ##
-## Usage: pw launch [--headless]   Start a new browser, print its port
-##        pw <port> <tool> [json]  Call a Playwright tool
-##        pw <port> close          Close browser and server
-##        pw cleanup               Kill all stale sessions
-##        pw install               Install Chromium browser binary
+## Usage: pw launch [--headless] [--persist]  Start a new browser, print its port
+##        pw <port> <tool> [json]             Call a Playwright tool
+##        pw <port> close                     Close browser and server
+##        pw cleanup                          Kill all stale sessions
+##        pw install                          Install Chromium browser binary
+##
+## By default, each launch uses an isolated in-memory profile (no persistent
+## cookies/storage). Pass --persist to reuse the default browser profile.
 
 set -euo pipefail
 

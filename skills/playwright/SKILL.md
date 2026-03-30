@@ -27,6 +27,13 @@ pw $PORT close
 - `pw launch --headless` — No visible browser. Use this for most agent work.
 - `pw launch` — Visible browser window. Use when the user wants to watch or the task requires visual verification.
 
+## Isolation
+
+By default, each `pw launch` uses an **isolated in-memory profile** — no cookies, storage, or state from previous sessions. This prevents stale cookies from causing authentication issues after server restarts.
+
+- `pw launch` — Fresh isolated profile (default). You'll need to log in each time.
+- `pw launch --persist` — Reuse the default browser profile with persistent cookies/storage. Useful when you want login state to survive across sessions.
+
 ## Session Management
 
 - `pw launch [--headless]` — Start a new browser. Prints the port number. Auto-cleans stale sessions from previous runs.

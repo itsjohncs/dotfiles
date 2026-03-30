@@ -5,7 +5,9 @@ set -eo pipefail
 #
 # - Loads the dotfiles plugin (for /dotfiles:dotfiles-healthcheck etc.)
 # - `--resume <id>` / `-r <id>` searches all projects for the conversation
-#   and launches claude from the correct working directory. Prefix IDs work.
+#   and launches claude from the correct working directory. Accepts UUIDs
+#   (or prefixes), conversation names (customTitle / agentName), or worktree
+#   names (cd into the worktree and show the resume picker).
 #
 # All other usage is passed through to claude unchanged.
 
@@ -16,6 +18,7 @@ find_conversation() {
     local projects_dir="$HOME/.claude/projects"
     local -a matches=()
 
+    # Try matching by file name (UUID prefix)
     for jsonl in "$projects_dir"/*/"${id_prefix}"*.jsonl; do
         [[ -e $jsonl ]] || continue
         local dir full_id
@@ -23,6 +26,23 @@ find_conversation() {
         full_id=$(basename "$jsonl" .jsonl)
         matches+=("$dir:$full_id")
     done
+
+    # If no file match, try matching by conversation name (customTitle/agentName)
+    if [[ ${#matches[@]} -eq 0 ]]; then
+        local jsonl
+        while IFS= read -r jsonl; do
+            [[ -n $jsonl ]] || continue
+            local dir full_id
+            dir=$(basename "$(dirname "$jsonl")")
+            full_id=$(basename "$jsonl" .jsonl)
+            matches+=("$dir:$full_id")
+        done < <(
+            {
+                grep -Fl "\"customTitle\":\"${id_prefix}\"" "$projects_dir"/*/*.jsonl
+                grep -Fl "\"agentName\":\"${id_prefix}\"" "$projects_dir"/*/*.jsonl
+            } 2>/dev/null | sort -u
+        )
+    fi
 
     case ${#matches[@]} in
     0) return 1 ;;
@@ -32,7 +52,7 @@ find_conversation() {
         for m in "${matches[@]}"; do
             echo "  ${m#*:}  (${m%%:*})" >&2
         done
-        return 1
+        return 2
         ;;
     esac
 }
@@ -121,35 +141,39 @@ main() {
         exec claude --plugin-dir "$DOTFILES_DIR" "${other_args[@]}"
     fi
 
-    local match
-    if ! match=$(find_conversation "$resume_id"); then
-        if [[ $? -eq 1 ]]; then
-            echo "c: conversation '$resume_id' not found in any project" >&2
-        fi
-        exit 1
-    fi
+    local match find_rc=0
+    match=$(find_conversation "$resume_id") || find_rc=$?
 
-    local project_dir="${match%%:*}"
-    local full_id="${match#*:}"
+    if [[ $find_rc -eq 0 ]]; then
+        # Found by UUID or conversation name - resume specific session
+        local project_dir="${match%%:*}"
+        local full_id="${match#*:}"
 
-    local real_path
-    if ! real_path=$(decode_project_dir "$project_dir"); then
-        echo "c: could not resolve directory for project '$project_dir'" >&2
-        echo "c: falling back to current directory" >&2
-        if [[ ${#other_args[@]} -gt 0 ]]; then
+        local real_path
+        if ! real_path=$(decode_project_dir "$project_dir"); then
+            echo "c: could not resolve directory for project '$project_dir'" >&2
+            echo "c: falling back to current directory" >&2
             exec claude --plugin-dir "$DOTFILES_DIR" --resume "$full_id" "${other_args[@]}"
-        else
-            exec claude --plugin-dir "$DOTFILES_DIR" --resume "$full_id"
         fi
+
+        echo "c: resuming in $real_path" >&2
+        cd "$real_path"
+        exec claude --plugin-dir "$DOTFILES_DIR" --resume "$full_id" "${other_args[@]}"
     fi
 
-    echo "c: resuming in $real_path" >&2
-    cd "$real_path"
-    if [[ ${#other_args[@]} -gt 0 ]]; then
-        exec claude --plugin-dir "$DOTFILES_DIR" --resume "$full_id" "${other_args[@]}"
-    else
-        exec claude --plugin-dir "$DOTFILES_DIR" --resume "$full_id"
+    # Not found as conversation — try as worktree name
+    if [[ $find_rc -eq 1 ]]; then
+        local toplevel
+        toplevel=$(git rev-parse --show-toplevel 2>/dev/null) || true
+        if [[ -n $toplevel && -d "$toplevel/.claude/worktrees/$resume_id" ]]; then
+            echo "c: resuming in $toplevel/.claude/worktrees/$resume_id" >&2
+            cd "$toplevel/.claude/worktrees/$resume_id"
+            exec claude --plugin-dir "$DOTFILES_DIR" --resume "${other_args[@]}"
+        fi
+        echo "c: '$resume_id' not found as conversation, name, or worktree" >&2
     fi
+    # find_rc=2: multiple matches (error already printed by find_conversation)
+    exit 1
 }
 
 main "$@"

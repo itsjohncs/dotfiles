@@ -21,6 +21,7 @@ function __main {
     alias pre="open -a Preview.app"
     alias t="TIMCOL_NAME=t timcol"
 
+    alias c="claude"
     alias aig="aider --model gpt-5 --reasoning low"
 
     local SCRIPT_DIR

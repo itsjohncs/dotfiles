@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-# c - Claude Code wrapper.
+# claude - Claude Code wrapper.
 #
 # - Loads the dotfiles plugin (for /dotfiles:dotfiles-healthcheck etc.)
 # - `--resume <id>` / `-r <id>` searches all projects for the conversation
@@ -12,6 +12,35 @@ set -eo pipefail
 # All other usage is passed through to claude unchanged.
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+
+# Find the real claude binary, skipping this wrapper script.
+SCRIPT_DIR="$DOTFILES_DIR/src/scripts"
+REAL_CLAUDE=""
+IFS=: read -ra _path_dirs <<<"$PATH"
+for _dir in "${_path_dirs[@]}"; do
+    [[ -x "$_dir/claude" ]] || continue
+    _resolved="$(cd "$_dir" 2>/dev/null && pwd -P)" || continue
+    [[ $_resolved == "$SCRIPT_DIR" ]] && continue
+    REAL_CLAUDE="$_dir/claude"
+    break
+done
+unset _path_dirs _dir _resolved
+
+if [[ -z $REAL_CLAUDE ]]; then
+    echo "claude: could not find the real claude binary in PATH" >&2
+    exit 1
+fi
+
+# Load additional plugin directories from ~/.config/claude-plugins (one path per line)
+EXTRA_PLUGIN_ARGS=()
+if [[ -f "$HOME/.config/claude-plugins" ]]; then
+    while IFS= read -r dir; do
+        dir="${dir%%#*}"       # strip comments
+        dir="${dir// /}"       # trim whitespace
+        dir="${dir/#\~/$HOME}" # expand ~
+        [[ -n $dir ]] && EXTRA_PLUGIN_ARGS+=(--plugin-dir "$dir")
+    done <"$HOME/.config/claude-plugins"
+fi
 
 find_conversation() {
     local id_prefix="$1"
@@ -48,7 +77,7 @@ find_conversation() {
     0) return 1 ;;
     1) echo "${matches[0]}" ;;
     *)
-        echo "c: multiple conversations match '$id_prefix':" >&2
+        echo "claude: multiple conversations match '$id_prefix':" >&2
         for m in "${matches[@]}"; do
             echo "  ${m#*:}  (${m%%:*})" >&2
         done
@@ -138,7 +167,7 @@ main() {
     done
 
     if ! $intercepting; then
-        exec claude --plugin-dir "$DOTFILES_DIR" "${other_args[@]}"
+        exec "$REAL_CLAUDE" --plugin-dir "$DOTFILES_DIR" "${EXTRA_PLUGIN_ARGS[@]}" "${other_args[@]}"
     fi
 
     local match find_rc=0
@@ -151,14 +180,14 @@ main() {
 
         local real_path
         if ! real_path=$(decode_project_dir "$project_dir"); then
-            echo "c: could not resolve directory for project '$project_dir'" >&2
-            echo "c: falling back to current directory" >&2
-            exec claude --plugin-dir "$DOTFILES_DIR" --resume "$full_id" "${other_args[@]}"
+            echo "claude: could not resolve directory for project '$project_dir'" >&2
+            echo "claude: falling back to current directory" >&2
+            exec "$REAL_CLAUDE" --plugin-dir "$DOTFILES_DIR" "${EXTRA_PLUGIN_ARGS[@]}" --resume "$full_id" "${other_args[@]}"
         fi
 
-        echo "c: resuming in $real_path" >&2
+        echo "claude: resuming in $real_path" >&2
         cd "$real_path"
-        exec claude --plugin-dir "$DOTFILES_DIR" --resume "$full_id" "${other_args[@]}"
+        exec "$REAL_CLAUDE" --plugin-dir "$DOTFILES_DIR" "${EXTRA_PLUGIN_ARGS[@]}" --resume "$full_id" "${other_args[@]}"
     fi
 
     # Not found as conversation — try as worktree name
@@ -166,11 +195,11 @@ main() {
         local toplevel
         toplevel=$(git rev-parse --show-toplevel 2>/dev/null) || true
         if [[ -n $toplevel && -d "$toplevel/.claude/worktrees/$resume_id" ]]; then
-            echo "c: resuming in $toplevel/.claude/worktrees/$resume_id" >&2
+            echo "claude: resuming in $toplevel/.claude/worktrees/$resume_id" >&2
             cd "$toplevel/.claude/worktrees/$resume_id"
-            exec claude --plugin-dir "$DOTFILES_DIR" --resume "${other_args[@]}"
+            exec "$REAL_CLAUDE" --plugin-dir "$DOTFILES_DIR" "${EXTRA_PLUGIN_ARGS[@]}" --resume "${other_args[@]}"
         fi
-        echo "c: '$resume_id' not found as conversation, name, or worktree" >&2
+        echo "claude: '$resume_id' not found as conversation, name, or worktree" >&2
     fi
     # find_rc=2: multiple matches (error already printed by find_conversation)
     exit 1

@@ -22,7 +22,6 @@ function __main {
     alias t="TIMCOL_NAME=t timcol"
 
     alias c="claude"
-    alias aig="aider --model gpt-5 --reasoning low"
 
     local SCRIPT_DIR
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"

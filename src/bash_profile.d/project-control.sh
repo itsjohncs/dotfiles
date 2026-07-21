@@ -1,6 +1,6 @@
 PROJECT_ROOTS=("$HOME/personal" "$HOME/elicit")
 
-## pd: Changes directory to project or clones a new one.
+## pd: Changes directory to project (repeat to climb out of a worktree) or clones a new one.
 function pd {
     if [[ -z $1 ]]; then
         local CURRENT_PROJECT_ROOT
@@ -12,6 +12,16 @@ function pd {
         if [[ -z $CURRENT_PROJECT_ROOT ]]; then
             echo "FATAL: You are not in a git repo." >&2
             return 1
+        fi
+
+        # Already at the root of a linked worktree: climb to the primary checkout.
+        if [[ $CURRENT_PROJECT_ROOT == "$PWD" ]]; then
+            local GIT_COMMON_DIR
+            GIT_COMMON_DIR="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)"
+            if [[ -n $GIT_COMMON_DIR && $(dirname "$GIT_COMMON_DIR") != "$PWD" ]]; then
+                cd "$(dirname "$GIT_COMMON_DIR")" || return 1
+                return 0
+            fi
         fi
 
         cd "$CURRENT_PROJECT_ROOT" || return 1

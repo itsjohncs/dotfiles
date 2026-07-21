@@ -4,8 +4,8 @@
 # .claude/worktrees/). Requires bash 4+; wd requires fzf.
 #
 #   ws  — list linked worktrees by recency (newest last, nearest the prompt)
-#   wd  — cd into a worktree, fuzzy-matched with fzf
-#   wp  — cd back to the primary checkout (parent repo)
+#   wd  — cd into a worktree, fuzzy-matched with fzf (wd .. pops back to the
+#         primary checkout; pd without args also climbs out of a worktree)
 #   cw  — start a new Claude Code session in a fresh worktree
 
 # Colors used by ws and its render helper (set per-call in ws).
@@ -95,6 +95,13 @@ function __wt_entries {
         rows+=("$epoch"$'\t'"${paths[$i]}"$'\t'"${branches[$i]}"$'\t'"${shas[$i]}")
     done
     printf '%s\n' "${rows[@]}" | sort -t$'\t' -k1,1 -rn
+}
+
+# Print the path of the primary checkout (parent repo).
+function __wt_primary_path {
+    local common
+    common=$(command git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || return 1
+    dirname "$common"
 }
 
 # Prefer the local default branch: Claude Code cuts worktrees from local
@@ -275,12 +282,26 @@ function ws {
     rm -rf "$tmpdir"
 }
 
-## wd: cd into a git worktree, fuzzy-matched with fzf
+## wd: cd into a git worktree, fuzzy-matched with fzf (wd .. → primary checkout)
 # Usage: wd [query...]
 # A unique fzf match jumps straight there; several matches open the fzf
 # picker seeded with the query (recency-ordered, newest on top, with a
-# commit-log preview); no query opens the picker over everything.
+# commit-log preview); no query opens the picker over everything, with a
+# ".." entry on top that pops back to the primary checkout.
 function wd {
+    local primary
+    if [[ ${1-} == ".." ]]; then
+        primary=$(__wt_primary_path) || {
+            echo "wd: not in a git repository" >&2
+            return 1
+        }
+        cd "$primary" || return 1
+        local branch
+        branch=$(command git branch --show-current 2>/dev/null)
+        echo "${primary##*/}  [${branch:-(detached)}]"
+        return
+    fi
+
     if ! command -v fzf >/dev/null 2>&1; then
         echo "wd: fzf not found — install it with: brew install fzf" >&2
         return 1
@@ -321,22 +342,18 @@ function wd {
             pick=$(printf '%s' "$lines" | fzf "${fzf_ui[@]}" --query="$*") || return 1
         fi
     else
+        # ".." on top pops back to the primary checkout.
+        if primary=$(__wt_primary_path); then
+            local pbranch
+            pbranch=$(command git -C "$primary" branch --show-current 2>/dev/null)
+            lines=".."$'\t'"primary"$'\t'"$primary"$'\t'"${pbranch:-(detached)}"$'\n'"$lines"
+        fi
         pick=$(printf '%s' "$lines" | fzf "${fzf_ui[@]}") || return 1
     fi
 
     IFS=$'\t' read -r _ _ path branch <<<"$pick"
     cd "$path" || return 1
     echo "${path##*/}  [$branch]"
-}
-
-## wp: cd from a worktree back to the primary checkout (parent repo)
-function wp {
-    local common
-    common=$(command git rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
-        echo "wp: not in a git repository" >&2
-        return 1
-    }
-    cd "$(dirname "$common")" || return 1
 }
 
 ## cw: Start a new Claude Code session in a fresh git worktree
@@ -347,7 +364,7 @@ function cw {
 
 function __wt_complete_wd {
     local cur=${COMP_WORDS[COMP_CWORD]}
-    local -a names=()
+    local -a names=("..")
     local line first=1
     while IFS= read -r line; do
         [[ $line == worktree\ * ]] || continue

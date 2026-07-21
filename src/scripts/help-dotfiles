@@ -15,17 +15,19 @@ ALIAS_RE = re.compile(r"^alias ([a-zA-Z0-9_-]+)=[\"'](.+)[\"']$")
 
 def parse_entries(path):
     basename = os.path.basename(path)
-    found_entry = False
+    in_block = False
     with open(path, encoding="utf8") as f:
         for line in f:
             line = line.strip()
+            is_doc = line.startswith("##") or line.startswith("//##")
 
-            if not found_entry and (match := ENTRY_RE.match(line)):
+            if is_doc and not in_block and (match := ENTRY_RE.match(line)):
                 command, description = match.groups()
                 yield Entry(command or basename, description, False)
-                found_entry = True
             elif match := ALIAS_RE.match(line):
                 yield Entry(*match.groups(), True)
+
+            in_block = is_doc
 
 
 IGNORE = {"complete-alias", "dark-mode-notify", "__pycache__"}
